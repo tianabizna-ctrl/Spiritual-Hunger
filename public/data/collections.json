@@ -1,0 +1,296 @@
+[
+  {
+    "slug": "media-content",
+    "name": "Media Content",
+    "blurb": "The flagship archive of full-length teachings, interviews and special messages.",
+    "accent": "gold",
+    "count": 85,
+    "thumbs": [
+      {
+        "id": "kwt9fSj8OYo",
+        "title": "10 Essential Time Management Strategies"
+      },
+      {
+        "id": "k1LZgkpZFI8",
+        "title": "10 Qualities of A Kingdom Father"
+      },
+      {
+        "id": "afzO1wBaZ7A",
+        "title": "Building Living From The Homefront"
+      }
+    ]
+  },
+  {
+    "slug": "animated",
+    "name": "Animated Teachings",
+    "blurb": "Dr. Munroe's core principles distilled into short animated lessons.",
+    "accent": "sage",
+    "count": 100,
+    "thumbs": [
+      {
+        "id": "l2wIx5Bqy0k",
+        "title": "10 Areas of Society To Work In"
+      },
+      {
+        "id": "nw2qhUS4_Ts",
+        "title": "10 Laws of Success"
+      },
+      {
+        "id": "49inPfZaemY",
+        "title": "10 Marks of A Secure Leader"
+      }
+    ]
+  },
+  {
+    "slug": "prayer-fasting",
+    "name": "Prayer & Fasting",
+    "blurb": "Teachings on prayer, fasting, spiritual discipline and intimacy with God.",
+    "accent": "violet",
+    "count": 12,
+    "thumbs": [
+      {
+        "id": "83fLrgMc69o",
+        "title": "Experience Miracles In Your Life: The Secret Power Of Praying In Jesus' Name"
+      },
+      {
+        "id": "1TO3yVW0X18",
+        "title": "How To Fast And Pray Effectively: Consecration Secrets With Dr. Myles Munroe"
+      },
+      {
+        "id": "a9HPsrN-eew",
+        "title": "How To Pray"
+      }
+    ]
+  },
+  {
+    "slug": "men-fatherhood",
+    "name": "Men & Fatherhood",
+    "blurb": "Manhood, fathering, sonship and the charge to build the next generation.",
+    "accent": "clay",
+    "count": 19,
+    "thumbs": [
+      {
+        "id": "k1LZgkpZFI8",
+        "title": "10 Qualities of A Kingdom Father"
+      },
+      {
+        "id": "QhGW7NH-DpQ",
+        "title": "A Man and His Sex Life Part 2"
+      },
+      {
+        "id": "bfU-s69cxjU",
+        "title": "Building Strong Families"
+      }
+    ]
+  },
+  {
+    "slug": "marriage",
+    "name": "Marriage & Relationships",
+    "blurb": "Covenant, courtship, communication and building a home that lasts.",
+    "accent": "rose",
+    "count": 16,
+    "thumbs": [
+      {
+        "id": "afzO1wBaZ7A",
+        "title": "Building Living From The Homefront"
+      },
+      {
+        "id": "O6guBwtT82s",
+        "title": "Foundational Principles For Male and Female Relationships"
+      },
+      {
+        "id": "c9g-lDkZL0M",
+        "title": "Kingdom Citizenship Success Laws of Marriage"
+      }
+    ]
+  },
+  {
+    "slug": "success",
+    "name": "Success",
+    "blurb": "Biblical success, excellence, diligence and the price of achievement.",
+    "accent": "gold",
+    "count": 15,
+    "thumbs": [
+      {
+        "id": "SZ7GasMDTuk",
+        "title": "4 Essential Keys For Personal Success & Prosperity Part 1"
+      },
+      {
+        "id": "Bl0mZle5sEc",
+        "title": "7 Key Spheres Of Wealth For Financial Success"
+      },
+      {
+        "id": "hAqKTlIfg8Q",
+        "title": "How To Achieve Success & Prosperity"
+      }
+    ]
+  },
+  {
+    "slug": "leadership",
+    "name": "Leadership",
+    "blurb": "Servant leadership, influence, mentorship and the stewardship of people.",
+    "accent": "ocean",
+    "count": 59,
+    "thumbs": [
+      {
+        "id": "Bl0mZle5sEc",
+        "title": "7 Key Spheres Of Wealth For Financial Success"
+      },
+      {
+        "id": "Nx3qr_wVUcY",
+        "title": "A King Sets The Standard"
+      },
+      {
+        "id": "MODNAOEHThE",
+        "title": "A Message To All Leaders"
+      }
+    ]
+  },
+  {
+    "slug": "kingdom",
+    "name": "Kingdom",
+    "blurb": "The gospel of the Kingdom, citizenship, culture and the King's agenda.",
+    "accent": "sage",
+    "count": 136,
+    "thumbs": [
+      {
+        "id": "Nx3qr_wVUcY",
+        "title": "A King Sets The Standard"
+      },
+      {
+        "id": "GxyZz06ic2U",
+        "title": "Benefits of The Kings Presence"
+      },
+      {
+        "id": "1giMPyvlPSY",
+        "title": "Breaking The Law of Sin and Death"
+      }
+    ]
+  },
+  {
+    "slug": "purpose",
+    "name": "Purpose",
+    "blurb": "Discovering, refining and fulfilling the reason you were created.",
+    "accent": "gold",
+    "count": 16,
+    "thumbs": [
+      {
+        "id": "kXTxO4tD49E",
+        "title": "Beat Fear & Embrace Future"
+      },
+      {
+        "id": "GeQsjUzBUhE",
+        "title": "Discovering Your Kingdom Destiny"
+      },
+      {
+        "id": "SCFOXEfK-Wc",
+        "title": "How Principles Protect Purpose and Potential"
+      }
+    ]
+  },
+  {
+    "slug": "crisis",
+    "name": "Crisis Management",
+    "blurb": "Faith, resilience and decision-making when life is shaken.",
+    "accent": "clay",
+    "count": 38,
+    "thumbs": [
+      {
+        "id": "kwt9fSj8OYo",
+        "title": "10 Essential Time Management Strategies"
+      },
+      {
+        "id": "nYM2fXflCiU",
+        "title": "Change Happens For Improvement & Advancement"
+      },
+      {
+        "id": "lcThaa7zJjs",
+        "title": "Crisis Comes To Destroy Traditions"
+      }
+    ]
+  },
+  {
+    "slug": "general",
+    "name": "General Teachings",
+    "blurb": "A small gathering of essential messages outside the main themes.",
+    "accent": "ocean",
+    "count": 5,
+    "thumbs": [
+      {
+        "id": "mJudOF53zxU",
+        "title": "The Most Important Person on Earth"
+      },
+      {
+        "id": "6VJ5BqAXVEM",
+        "title": "The Power of Mentoring & Succession: How To Secure Your Legacy"
+      },
+      {
+        "id": "5JG0S9jTp78",
+        "title": "The Purpose and Priority of Singleness"
+      }
+    ]
+  },
+  {
+    "slug": "available",
+    "name": "Available Teachings",
+    "blurb": "The wide catch-all archive — a cross-section of the entire ministry.",
+    "accent": "violet",
+    "count": 230,
+    "thumbs": [
+      {
+        "id": "r-63eqvea4Y",
+        "title": "15 Principles For Effective Witnessing Part 1"
+      },
+      {
+        "id": "HgPUINet014",
+        "title": "15 Principles for Effective Witnessing Part 2"
+      },
+      {
+        "id": "SZ7GasMDTuk",
+        "title": "4 Essential Keys For Personal Success & Prosperity Part 1"
+      }
+    ]
+  },
+  {
+    "slug": "short-messages",
+    "name": "Short Messages",
+    "blurb": "Brief, concentrated words for the day.",
+    "accent": "rose",
+    "count": 43,
+    "thumbs": [
+      {
+        "id": "Nx3qr_wVUcY",
+        "title": "A King Sets The Standard"
+      },
+      {
+        "id": "sgIU4ue_2QI",
+        "title": "A Lesson on Legacy Building"
+      },
+      {
+        "id": "MODNAOEHThE",
+        "title": "A Message To All Leaders"
+      }
+    ]
+  },
+  {
+    "slug": "selman",
+    "name": "SELMAN",
+    "blurb": "The SELMAN playlist: teachings gathered from the full series.",
+    "accent": "ocean",
+    "count": 22,
+    "thumbs": [
+      {
+        "id": "wgsJbNzePrI",
+        "title": "7 Warning Signs Your Church Is Secretly Destroying Your Future | Apostle Joshua Selman"
+      },
+      {
+        "id": "oNIT_kYWQzo",
+        "title": "A Prayer to Start the Month With God | Apostle Joshua Selman"
+      },
+      {
+        "id": "CUOr3Za4SHw",
+        "title": "Command Your Day With | Help My Unbelief | Apostle Joshua Selman Messages"
+      }
+    ]
+  }
+]

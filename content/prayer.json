@@ -1,0 +1,162 @@
+[
+  {
+    "slug": "a-heart-that-seeks",
+    "name": "A Heart That Seeks",
+    "icon": "flame",
+    "focus": "Begin by turning your attention toward God. You do not have to perform; you only have to come.",
+    "scripture": { "ref": "Jeremiah 29:13" },
+    "prompt": "Lord, You are the one I am looking for.",
+    "points": [
+      "Thank God for His promise that He can be found.",
+      "Name the things that have been competing for your attention.",
+      "Ask for a fresh hunger for His presence, not only His gifts.",
+      "Sit in silence for two minutes and let your heart rest in Him."
+    ],
+    "relatedTopics": ["Prayer", "Spiritual Growth"],
+    "collection": "prayer-fasting"
+  },
+  {
+    "slug": "the-kingdom-first",
+    "name": "The Kingdom First",
+    "icon": "crown",
+    "focus": "Pray for God's rule to come into the ordinary places of your life — your home, your work, your city.",
+    "scripture": { "ref": "Matthew 6:10" },
+    "prompt": "Your kingdom come, Your will be done, here in me.",
+    "points": [
+      "Ask God to search your heart for any area where you have taken the throne.",
+      "Pray for His will to be done in your family and closest relationships.",
+      "Pray for your city: for justice, peace, and the courage to serve.",
+      "Ask for eyes to see the kingdom opportunities already around you."
+    ],
+    "relatedTopics": ["Kingdom", "Leadership"],
+    "collection": "kingdom"
+  },
+  {
+    "slug": "daily-bread",
+    "name": "Daily Bread",
+    "icon": "bread",
+    "focus": "Bring your needs honestly. Provision is not a reward for worry; it is a gift from a Father who knows.",
+    "scripture": { "ref": "Philippians 4:19" },
+    "prompt": "Father, give me what I need for today, and trust You for tomorrow.",
+    "points": [
+      "Thank God for one specific provision from this week.",
+      "Name the need you are tempted to carry alone.",
+      "Ask for wisdom to work, save, and share what He gives.",
+      "Pray for someone in your circle who is in need right now."
+    ],
+    "relatedTopics": ["Faith", "Generosity"],
+    "collection": "success"
+  },
+  {
+    "slug": "under-the-shadow",
+    "name": "Under the Shadow",
+    "icon": "shield",
+    "focus": "You are not praying for a life without danger. You are praying for the presence of God inside it.",
+    "scripture": { "ref": "Psalm 91:1-2" },
+    "prompt": "You are my refuge and my fortress, and I trust You.",
+    "points": [
+      "Name the fear that has been loudest this week.",
+      "Ask God to be your dwelling place, not only your emergency exit.",
+      "Pray protection over your home, your work, and your travels.",
+      "Pray for courage to walk forward in faith, not paralysis."
+    ],
+    "relatedTopics": ["Crisis", "Faith"],
+    "collection": "crisis"
+  },
+  {
+    "slug": "a-house-of-peace",
+    "name": "A House of Peace",
+    "icon": "home",
+    "focus": "Pray over the people you live with and the home you are building, one small act of love at a time.",
+    "scripture": { "ref": "Ephesians 3:14-19" },
+    "prompt": "Father, let Your love be the walls of our home.",
+    "points": [
+      "Thank God for the people in your home, even the difficult ones.",
+      "Name one relationship that needs patience or repair.",
+      "Ask for words that build rather than words that wound.",
+      "Pray that your home would become a place of welcome and safety."
+    ],
+    "relatedTopics": ["Marriage", "Family", "Fatherhood"],
+    "collection": "marriage"
+  },
+  {
+    "slug": "wisdom-to-lead",
+    "name": "Wisdom to Lead",
+    "icon": "compass",
+    "focus": "Leadership is stewardship. Pray for wisdom to carry people, not merely to manage tasks.",
+    "scripture": { "ref": "1 Timothy 2:1-2" },
+    "prompt": "Give me a heart that serves and wisdom that builds.",
+    "points": [
+      "Pray for the leaders in your life, especially those you find difficult.",
+      "Ask God to show you the people He has entrusted to your care.",
+      "Name one decision that needs wisdom; ask for clarity.",
+      "Pray for humility to receive correction and courage to make the call."
+    ],
+    "relatedTopics": ["Leadership", "Wisdom", "Success"],
+    "collection": "leadership"
+  },
+  {
+    "slug": "through-the-storm",
+    "name": "Through the Storm",
+    "icon": "anchor",
+    "focus": "Bring the storm to Jesus. He is not distant from your fear, and He is not silent in your night.",
+    "scripture": { "ref": "Psalm 46:1-3" },
+    "prompt": "Be still, and know that You are God.",
+    "points": [
+      "Tell God exactly what you are feeling, without editing.",
+      "Ask Him to speak peace to the part of you that is panicking.",
+      "Pray for strength to do the next right thing, not the whole future.",
+      "Ask for people around you who can carry hope while you are tired."
+    ],
+    "relatedTopics": ["Crisis", "Faith", "Prayer"],
+    "collection": "crisis"
+  },
+  {
+    "slug": "a-grateful-heart",
+    "name": "A Grateful Heart",
+    "icon": "sun",
+    "focus": "Gratitude is not denial. It is choosing to see what is still good, even in a hard season.",
+    "scripture": { "ref": "Psalm 100:4-5" },
+    "prompt": "Thank You, Lord, for who You are and for what You have done.",
+    "points": [
+      "Name three gifts from the last twenty-four hours.",
+      "Thank God for one thing you have been taking for granted.",
+      "Ask Him to heal the places where bitterness has taken root.",
+      "Pray for a heart that is generous with thanks and slow to complain."
+    ],
+    "relatedTopics": ["Faith", "Generosity"],
+    "collection": "prayer-fasting"
+  },
+  {
+    "slug": "forgive-and-be-free",
+    "name": "Forgive and Be Free",
+    "icon": "drop",
+    "focus": "Forgiveness is not pretending the wound did not happen. It is releasing the debt to God.",
+    "scripture": { "ref": "1 John 1:9" },
+    "prompt": "Lord, have mercy on me, and make me merciful.",
+    "points": [
+      "Ask God to reveal anything you need to confess; receive His forgiveness.",
+      "Name the person you are holding to a debt; ask for grace to release them.",
+      "Pray for the person who hurt you, even if you do not feel like it.",
+      "Ask God to heal the wound, not just remove the anger."
+    ],
+    "relatedTopics": ["Grace", "Marriage", "Family"],
+    "collection": "prayer-fasting"
+  },
+  {
+    "slug": "healing-and-strength",
+    "name": "Healing and Strength",
+    "icon": "heart",
+    "focus": "Pray for healing of body, mind, and spirit, and for strength to keep walking while you wait.",
+    "scripture": { "ref": "James 5:15-16" },
+    "prompt": "Lord, heal what only You can heal.",
+    "points": [
+      "Name the area where you need healing, and ask boldly.",
+      "Pray for the doctors, caregivers, and friends who are helping.",
+      "Ask for strength to do the next faithful thing while you wait.",
+      "Pray for someone else who is sick or discouraged today."
+    ],
+    "relatedTopics": ["Faith", "Crisis", "Prayer"],
+    "collection": "crisis"
+  }
+]

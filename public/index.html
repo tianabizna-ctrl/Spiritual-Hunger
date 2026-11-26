@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spiritual Hunger — A Myles Munroe Study Library</title>
+  <meta name="description" content="Explore Dr. Myles Munroe’s teachings, read daily devotionals, and spend time in guided prayer." />
+  <meta name="theme-color" content="#0d2b23" />
+  <meta property="og:title" content="Spiritual Hunger — A Myles Munroe Study Library" />
+  <meta property="og:description" content="Feed the hunger. A living library of Dr. Myles Munroe's teachings, shaped into daily bread for prayer and devotion." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://i.ytimg.com/vi/PhRhhnw1tLs/maxresdefault.jpg" />
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Manrope:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script>
+    (function () {
+      try {
+        var saved = JSON.parse(localStorage.getItem("sh.theme"));
+        var theme = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+        var size = JSON.parse(localStorage.getItem("sh.readerSize"));
+        if (size) document.documentElement.setAttribute("data-reader-size", size);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="grain" aria-hidden="true"></div>
+  <div id="app">
+    <div class="boot">
+      <div class="boot-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none"><path d="M18 50V31a14 14 0 0 1 28 0v19" stroke="currentColor" stroke-width="2"/><path d="M32 42c4-3.2 5.6-6.4 4-10.4-.8-2.2-2.9-4-4-6.4-1.1 2.4-3.2 4.2-4 6.4-1.6 4 0 7.2 4 10.4Z" fill="currentColor"/></svg>
+      </div>
+      <p>Preparing the table</p>
+    </div>
+  </div>
+  <div id="search-root"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./assets/js/app.js"></script>
+</body>
+</html>

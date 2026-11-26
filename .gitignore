@@ -1,0 +1,6 @@
+.sources/
+node_modules/
+.DS_Store
+*.log
+__pycache__/
+.preflight.json
