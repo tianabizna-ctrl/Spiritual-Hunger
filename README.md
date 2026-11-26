@@ -10,6 +10,12 @@ Captions can contain recognition and spacing errors. Follow **Watch source** in 
 
 The [Feeling lost](https://tianabizna-ctrl.github.io/Spiritual-Hunger/#/collections/feeling-lost) and [Morning Prayer](https://tianabizna-ctrl.github.io/Spiritual-Hunger/#/collections/morning-prayer) playlists add 47 English transcripts with individual reflection prompts: all 18 from Feeling lost and 29 of 42 from Morning Prayer. YouTube marked the other 13 entries unavailable. Playlist order and original IDs are recorded in `content/selman-playlists.json`.
 
+## Additional playlist collections
+
+The [collections page](https://tianabizna-ctrl.github.io/Spiritual-Hunger/#/collections) includes **Apostle Joshua Selman Messages**, **Prayer**, **Mindset & Mind Transformation**, **Recomfort**, **Brokenness**, **Spiritual Hunger**, **Focus on God**, **Spiritual Realm**, **Trusting God**, **Joshua Selman: December**, and **The Holy Spirit**. The 11 playlists contain 404 entries and 380 distinct video IDs. The first playlist is the existing 22-message Selman collection.
+
+Open **Playlist contents in source order** within a collection for its complete list. Where a transcript is available the entry opens its reader; other entries link to YouTube. Shared videos use the same reader and bookmark across collections. Channel credits identify the uploader, which can differ from the speaker.
+
 ## YouTube playlist skill for Arena AI
 
 [Download the fetching skill and Python scripts](https://tianabizna-ctrl.github.io/Spiritual-Hunger/downloads/youtube-transcript-library.zip), or use the local copy at `public/downloads/youtube-transcript-library.zip`. Extract it and open `ARENA.md` for the paste-ready prompt. The toolkit checks YouTube access, lists playlist entries, downloads captions and verifies transcript files. If your Arena workspace cannot reach YouTube, upload the fetched JSON instead. No video downloads are needed.

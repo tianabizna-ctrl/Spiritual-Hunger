@@ -35,7 +35,7 @@ def caption_url(info):
     """Prefer manual English, then original English ASR, then English ASR."""
     for key in ("subtitles", "automatic_captions"):
         tracks = info.get(key) or {}
-        for lang in ("en", "en-orig", "en-US", "en-GB"):
+        for lang in ("en-orig", "en", "en-US", "en-GB"):
             for track in tracks.get(lang, []):
                 if track.get("ext") == "json3":
                     return track["url"], lang, key
@@ -117,6 +117,7 @@ def fetch_one(rec):
                 "title": info.get("title", rec["title"]),
                 "duration": info.get("duration", 0),
                 "source": source,
+                "translated": "tlang=en" in url,
                 "status": status,
             }, ensure_ascii=False))
             return (status, vid, chars)
@@ -129,8 +130,13 @@ def fetch_one(rec):
 
 def main():
     manifest = json.loads((SRC / "manifest.json").read_text())
-    todo = [m for m in manifest if not (OUT / f"{m['id']}.json").exists()]
-    log(f"Manifest {len(manifest)} | already fetched {len(manifest)-len(todo)} | todo {len(todo)}")
+    records = {m['id']: m for m in manifest}
+    for playlist in json.loads((ROOT / 'content' / 'selman-playlists.json').read_text()):
+        for video in playlist['videos']:
+            if video.get('title'):
+                records.setdefault(video['id'], video)
+    todo = [m for m in records.values() if not (OUT / f"{m['id']}.json").exists()]
+    log(f"Manifest {len(records)} | already fetched {len(records)-len(todo)} | todo {len(todo)}")
 
     stats = {"ok": 0, "empty": 0, "fail": 0, "cached": 0}
     failures = []

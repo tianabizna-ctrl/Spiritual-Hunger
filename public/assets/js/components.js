@@ -20,10 +20,20 @@ export const COLLECTION_NAMES = {
   "short-messages": "Short Messages",
   "feeling-lost": "Feeling lost",
   "morning-prayer": "Morning Prayer",
+  selman: "Apostle Joshua Selman Messages",
+  "selman-december": "Joshua Selman: December",
+  mindset: "Mindset & Mind Transformation",
+  "focus-on-god": "Focus on God",
+  "holy-spirit": "The Holy Spirit",
 };
 
 export function collectionName(slug) {
-  return COLLECTION_NAMES[slug] || String(slug || "").replace(/-/g, " ");
+  return COLLECTION_NAMES[slug] || String(slug || "").replace(/-/g, " ").replace(/\b\w/g, ch => ch.toUpperCase());
+}
+
+export function sourceLabel(message) {
+  if (message.channel) return `Channel: ${message.channel}`;
+  return ['selman', 'feeling-lost', 'morning-prayer'].includes(message.collection) ? 'Joshua Selman collection' : 'Dr. Myles Munroe';
 }
 
 export function topicIcon(topic) {
@@ -33,7 +43,7 @@ export function topicIcon(topic) {
 export function logo(size = "") {
   return `<a class="logo" href="#/" aria-label="Spiritual Hunger — home">
     <span class="logo-mark">${logoMark}</span>
-    <span class="logo-text">Spiritual Hunger<small>A Munroe Global Study Library</small></span>
+    <span class="logo-text">Spiritual Hunger<small>A prayer &amp; devotional library</small></span>
   </a>`;
 }
 
@@ -85,7 +95,7 @@ export function footer() {
       <div class="footer-grid">
         <div class="footer-brand">
           ${logo()}
-          <p class="footer-mission">A quiet place to read, pray, and return to the Word. Built from the teaching archive of Dr. Myles Munroe.</p>
+          <p class="footer-mission">A quiet place to read, pray, and return to the Word, with teachings from the Munroe Global archive and curated ministry playlists.</p>
           <p class="footer-note">Feed the hunger · Stay rooted · Live on purpose</p>
         </div>
         <div class="footer-col">
@@ -119,7 +129,7 @@ export function footer() {
         </div>
       </div>
       <div class="footer-bottom">
-        <p>An independent study library. Sermon videos and transcripts belong to Munroe Global. Captions are machine-generated and may contain errors; every message links to its original source. Scripture quotations are from the King James Version (public domain).</p>
+        <p>An independent study library. Every message links to its source video. Captions may contain transcription errors. Scripture quotations are from the King James Version.</p>
         <p>© ${new Date().getFullYear()} Spiritual Hunger</p>
       </div>
       <div class="footer-wordmark" aria-hidden="true">Spiritual Hunger</div>
@@ -168,7 +178,7 @@ export function messageCard(m) {
     <div class="card-body">
       <div class="card-kicker"><span>${esc(collectionName(m.collection))}</span><span class="dot"></span><span class="muted">${fmt.minutes(m.minutes)}</span></div>
       <h3 class="card-title"><a href="#/read/${encodeURIComponent(m.id)}">${esc(m.title)}</a></h3>
-      <div class="card-meta"><span>${['selman','feeling-lost','morning-prayer'].includes(m.collection) ? 'Joshua Selman collection' : 'Dr. Myles Munroe'}</span><span class="dot"></span><span>${m.words ? `${fmt.compact(m.words)} words` : "Message"}</span></div>
+      <div class="card-meta"><span>${esc(sourceLabel(m))}</span><span class="dot"></span><span>${m.words ? `${fmt.compact(m.words)} words` : "Message"}</span></div>
       ${topics ? `<div class="card-topics">${topics}</div>` : ""}
     </div>
   </article>`;

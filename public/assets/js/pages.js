@@ -3,7 +3,7 @@
 import { icon, TOPIC_ICONS } from "./icons.js";
 import {
   header, footer, pageHero, sectionHead, messageCard, devotionalCard,
-  collectionCard, emptyState, quoteBand, collectionName, topicIcon,
+  collectionCard, emptyState, quoteBand, collectionName, sourceLabel, topicIcon,
 } from "./components.js";
 import {
   data, fmt, esc, image, dailyIndex, relatedMessages, topicCounts,
@@ -62,9 +62,9 @@ export async function homePage() {
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-copy">
-          <span class="eyebrow">The Munroe Global Archive · Est. in purpose</span>
+          <span class="eyebrow">The prayer &amp; teaching archive</span>
           <h1 class="hero-title">Feed the<br /><em>hunger.</em></h1>
-          <p class="hero-sub">A living library of Dr. Myles Munroe's teaching on purpose, prayer, the Kingdom, and the life God intended — <strong>${fmt.number(stats.messages)} messages</strong>, gathered into one quiet place for your devotion.</p>
+          <p class="hero-sub">Explore teachings from Dr. Myles Munroe, Apostle Joshua Selman, and other ministries — <strong>${fmt.number(stats.messages)} messages</strong> on purpose, prayer, and the life of faith, gathered in one place for your devotion.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#/library">Enter the library ${icon("arrowRight")}</a>
             <a class="btn btn-ghost" href="#/devotionals/${encodeURIComponent(today.slug)}">Today's devotion ${icon("arrowRight")}</a>
@@ -202,7 +202,7 @@ export async function homePage() {
         ${sectionHead({
           eyebrow: "The collections",
           title: "Every room in the <em>house.</em>",
-          sub: "Thirteen archives, each one a different angle on the same call: live on purpose, under the King.",
+          sub: "Explore the original playlists by theme, from purpose and prayer to trusting God.",
           link: "#/collections",
           linkLabel: "See all collections",
         })}
@@ -211,7 +211,7 @@ export async function homePage() {
     </section>
   </main>`;
 
-  return { title: "Spiritual Hunger — A Myles Munroe Study Library", content };
+  return { title: "Spiritual Hunger — Prayer & Teaching Library", content };
 }
 
 /* ============================================================
@@ -421,6 +421,9 @@ export async function collectionPage(slug) {
   if (!c) return notFoundPage("We could not find that collection.");
   const items = sortMessages(index.filter((m) => m.collections.includes(slug)), "title");
   if (c.playlistOrder) items.sort((a, b) => c.playlistOrder.indexOf(a.id) - c.playlistOrder.indexOf(b.id));
+  const readers = new Map(items.map(m => [m.id, m]));
+  const playlistOrder = c.playlistOrder || [];
+  const readableEntries = playlistOrder.filter(id => readers.has(id)).length;
   const counts = topicCounts(items);
   const topics = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
   const hours = Math.round(items.reduce((s, m) => s + m.minutes, 0) / 60);
@@ -443,8 +446,13 @@ export async function collectionPage(slug) {
       <div>
         <h1>${esc(c.name)}</h1>
         <p>${fmt.number(items.length)} messages · ${fmt.number(hours)} hours of reading · ${esc(c.blurb)}</p>
-        ${c.playlistId ? `<p><a href="#/devotionals/${c.devotional}">Read the collection devotional</a> · <a href="https://www.youtube.com/playlist?list=${c.playlistId}">YouTube playlist</a> · ${items.length} of ${c.playlistOrder.length} entries available</p>` : ""}
-        ${c.playlistOrder?.length > items.length ? `<details><summary>Unavailable playlist entries</summary><ol>${c.playlistOrder.map((id, i) => items.some(m => m.id === id) ? "" : `<li value="${i + 1}"><a href="https://www.youtube.com/watch?v=${esc(id)}">${esc(id)}</a> · Video unavailable on YouTube</li>`).join("")}</ol></details>` : ""}
+        ${c.playlistId ? `<p>${c.devotional ? `<a href="#/devotionals/${encodeURIComponent(c.devotional)}">Read the collection devotional</a> · ` : ""}<a href="https://www.youtube.com/playlist?list=${encodeURIComponent(c.playlistId)}">YouTube playlist</a> · Transcripts for ${readableEntries} of ${playlistOrder.length} entries</p>
+          <details class="playlist-contents"${readableEntries ? "" : " open"}><summary>Playlist contents in source order</summary><ol>${playlistOrder.map(id => {
+            const message = readers.get(id);
+            if (message) return `<li><a href="#/read/${encodeURIComponent(id)}">${esc(message.title)}</a></li>`;
+            const title = c.sourceOnlyTitles?.[id];
+            return `<li><a href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}">${esc(title || id)}</a> · ${title ? 'Source video only' : 'No public title or transcript'}</li>`;
+          }).join("")}</ol></details>` : ""}
       </div>
       <a class="link-arrow" href="#/library?c=${encodeURIComponent(slug)}">Open in library ${icon("arrowRight")}</a>
     </div>
@@ -494,7 +502,7 @@ export async function readerPage(id) {
             <span class="eyebrow">${esc(collectionName(doc.collection))}</span>
             <h1 class="reader-title">${esc(doc.title)}</h1>
             <div class="reader-meta">
-              <span>${['selman','feeling-lost','morning-prayer'].includes(doc.collection) ? 'Joshua Selman collection' : 'Dr. Myles Munroe'}</span><span class="dot"></span>
+              <span>${esc(sourceLabel(doc))}</span><span class="dot"></span>
               <span>${fmt.minutes(doc.minutes)}</span><span class="dot"></span>
               <span>${fmt.number(doc.words)} words</span><span class="dot"></span>
               <span>${doc.kind === "prayer" ? "Prayer & worship" : "Teaching"}</span>
@@ -525,7 +533,7 @@ export async function readerPage(id) {
             ${related[0] ? `<a class="btn btn-primary" href="#/read/${encodeURIComponent(related[0].id)}">Read next ${icon("arrowRight")}</a>` : ""}
             <a class="btn btn-outline" href="#/library">Browse the library</a>
           </div>
-          <p class="reader-source-note">This transcript is generated from the public YouTube captions of the original message and may contain transcription errors. The video remains the authoritative source. <a href="${source}" target="_blank" rel="noopener noreferrer">Watch “${esc(doc.title)}” on YouTube ${icon("external")}</a>.</p>
+          <p class="reader-source-note">${text.translated ? 'These captions are machine-translated into English.' : 'This transcript comes from public YouTube captions.'} Check the original recording for wording. <a href="${source}" target="_blank" rel="noopener noreferrer">Watch “${esc(doc.title)}” on YouTube ${icon("external")}</a>.</p>
         </div>
       </article>
       <aside class="reader-sidebar">
@@ -976,11 +984,11 @@ export async function prayerPage() {
    ============================================================ */
 export async function collectionsPage() {
   const [collections, stats] = await Promise.all([data.collections(), data.stats()]);
-  const active = collections.filter((c) => c.count > 0);
+  const active = collections.filter((c) => c.count > 0 || c.playlistId);
   const content = `${pageHero({
     eyebrow: "The collections",
     title: "Every room in the <em>house.</em>",
-    sub: "The archive is organised into thirteen collections, each one a different angle on the same call: live on purpose, under the King, for the sake of others.",
+    sub: "Browse the teachings in their original playlist groupings. Choose a theme for today or work through a series in order.",
     stats: [
       { value: fmt.number(active.length), label: "Collections" },
       { value: fmt.number(stats.messages), label: "Messages" },
@@ -1092,14 +1100,14 @@ export async function aboutPage() {
         <p>That sentence has travelled further than most sermons. It is the reason this library exists: not to collect content, but to help a hungry heart find its way back to purpose, prayer, and the Kingdom of God.</p>
         <p>Dr. Myles Munroe (1954–2014) was a Bahamian teacher, author, and pastor whose work reached millions. He founded Bahamas Faith Ministries International and wrote widely on purpose, potential, leadership, marriage, and the Kingdom. His teaching was marked by a single conviction: every person was created with a purpose, and that purpose is discovered in relationship with God.</p>
         <h2>What you'll find here</h2>
-        <p><strong>${fmt.number(stats.messages)} messages</strong> across <strong>${fmt.number(stats.collections)} collections</strong>, gathered from the public Munroe Global YouTube playlists. Each message has a full, searchable transcript, a reading view, Scripture references, topics, and a link to the original video. Alongside the archive are ${fmt.number(21)} daily devotions and a prayer room with guided prayers and a private prayer list.</p>
+        <p><strong>${fmt.number(stats.messages)} messages</strong> across <strong>${fmt.number(stats.collections)} collections</strong>, gathered from Munroe Global and other public ministry playlists. Each reader links to the original video. Alongside the archive are daily devotions and a prayer room with guided prayers and a private prayer list.</p>
         <p>This is not a replacement for your local church, your Bible, or your own conversation with God. It is a study aid — a quiet room where you can read slowly and take what you learn into prayer.</p>
         <h2>How to use it</h2>
         <p><strong>Read.</strong> Begin with a collection or a topic. The reader is designed for long-form attention: no autoplay, no feed, no hurry.</p>
         <p><strong>Reflect.</strong> Open the daily devotions. Each one gives you a Scripture, a short reflection, a prayer, and one practice for the day.</p>
         <p><strong>Pray.</strong> Use the prayer room timer, pray through one of the guided themes, or write down what you are carrying. The list stays on your device.</p>
         <h2>A note on the transcripts</h2>
-        <p>Transcripts are generated from YouTube's public captions and cleaned into paragraphs. They are machine-generated: names, punctuation, and phrasing may contain errors. The original video remains the authoritative source, and every reader links to it. Sermon content and videos belong to Munroe Global. This site is an independent study project, not an official Munroe Global property.</p>
+        <p>Transcripts come from YouTube's public captions and are cleaned into paragraphs. Names, punctuation, and phrasing may contain errors. Every reader links to the original video. This site is an independent study project and is not affiliated with the featured ministries.</p>
         <p>Scripture quotations are from the King James Version, which is in the public domain. The design, reading experience, devotionals, and prayer guides were created for this library.</p>
         <h2>Sources & credits</h2>
         <p>With gratitude to <a href="https://www.munroeglobal.com" target="_blank" rel="noopener noreferrer">Munroe Global</a> for preserving and sharing this teaching archive. You can watch the original messages on the <a href="https://www.youtube.com/@MunroeGlobal" target="_blank" rel="noopener noreferrer">Munroe Global YouTube channel</a>.</p>

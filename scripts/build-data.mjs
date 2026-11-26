@@ -36,7 +36,6 @@ const COLLECTIONS = [
   { slug: "general", name: "General Teachings", blurb: "A small gathering of essential messages outside the main themes.", accent: "ocean" },
   { slug: "available", name: "Available Teachings", blurb: "The wide catch-all archive — a cross-section of the entire ministry.", accent: "violet" },
   { slug: "short-messages", name: "Short Messages", blurb: "Brief, concentrated words for the day.", accent: "rose" },
-  { slug: "selman", name: "SELMAN", blurb: "The SELMAN playlist: teachings gathered from the full series.", accent: "ocean" },
   ...selmanPlaylists.map(({ videos, ...collection }) => ({ ...collection, playlistOrder: videos.map(v => v.id) })),
 ];
 
@@ -57,6 +56,7 @@ const COLLECTION_TOPIC = {
   selman: "Faith",
   "feeling-lost": "Faith",
   "morning-prayer": "Prayer",
+  ...Object.fromEntries(selmanPlaylists.filter(p => p.topic).map(p => [p.slug, p.topic])),
 };
 
 const TOPICS = {
@@ -282,11 +282,12 @@ async function main() {
   const practices = new Map();
   for (const playlist of selmanPlaylists) {
     for (const video of playlist.videos) {
-      if (!video.title) continue;
+      if (!video.title && !byId.has(video.id)) continue;
       const rec = byId.get(video.id) || { id: video.id, title: video.title, collections: [] };
       if (!rec.collections.includes(playlist.slug)) rec.collections.push(playlist.slug);
+      if (video.channel) rec.channel = video.channel;
       byId.set(video.id, rec);
-      practices.set(video.id, video.practice);
+      if (video.practice) practices.set(video.id, video.practice);
     }
   }
   await mkdir(TEXT_OUT, { recursive: true });
@@ -324,13 +325,14 @@ async function main() {
     const refs = scriptureRefs(allText);
     const topics = topicScore(allText, title, collection);
     const readMinutes = Math.max(1, Math.round(wc / 200));
-    const kind = rec.collections.includes("prayer-fasting") || /\b(prayer|praying|fasting|intercession|worship|holy spirit|altar|revival)\b/i.test(title)
+    const kind = rec.collections.some(slug => COLLECTION_TOPIC[slug] === "Prayer") || /\b(prayer|praying|fasting|intercession|worship|holy spirit|altar|revival)\b/i.test(title)
       ? "prayer" : "teaching";
     const excerpt = excerptFrom(paras);
     const doc = {
       id: rec.id,
       title,
       collection,
+      channel: rec.channel,
       collections: rec.collections,
       topics,
       kind,
@@ -356,6 +358,7 @@ async function main() {
       topics: doc.topics,
       paragraphs: paras,
       practice: practices.get(doc.id),
+      translated: raw.translated || undefined,
       scriptureRefs: refs,
       words: wc,
       minutes: readMinutes,
@@ -385,8 +388,11 @@ async function main() {
 
   const collections = COLLECTIONS.map((c) => {
     const items = index.filter((m) => m.collections.includes(c.slug));
+    const readable = new Set(items.map(m => m.id));
+    const playlist = selmanPlaylists.find(p => p.slug === c.slug);
     return {
       ...c,
+      sourceOnlyTitles: playlist && Object.fromEntries(playlist.videos.filter(v => v.title && !readable.has(v.id)).map(v => [v.id, v.title])),
       count: items.length,
       thumbs: items.slice(0, 3).map((m) => ({ id: m.id, title: m.title })),
     };
@@ -398,7 +404,7 @@ async function main() {
 
   const stats = {
     messages: index.length,
-    collections: collections.filter((c) => c.count > 0).length,
+    collections: collections.filter((c) => c.count > 0 || c.playlistId).length,
     words: totalWords,
     hours: Math.round(totalHours * 10) / 10,
     prayerMessages: index.filter((m) => m.kind === "prayer").length,
