@@ -18,6 +18,8 @@ export const COLLECTION_NAMES = {
   general: "General Teachings",
   available: "Available Teachings",
   "short-messages": "Short Messages",
+  "feeling-lost": "Feeling lost",
+  "morning-prayer": "Morning Prayer",
 };
 
 export function collectionName(slug) {
@@ -166,7 +168,7 @@ export function messageCard(m) {
     <div class="card-body">
       <div class="card-kicker"><span>${esc(collectionName(m.collection))}</span><span class="dot"></span><span class="muted">${fmt.minutes(m.minutes)}</span></div>
       <h3 class="card-title"><a href="#/read/${encodeURIComponent(m.id)}">${esc(m.title)}</a></h3>
-      <div class="card-meta"><span>${m.collection === 'selman' ? 'Joshua Selman collection' : 'Dr. Myles Munroe'}</span><span class="dot"></span><span>${m.words ? `${fmt.compact(m.words)} words` : "Message"}</span></div>
+      <div class="card-meta"><span>${['selman','feeling-lost','morning-prayer'].includes(m.collection) ? 'Joshua Selman collection' : 'Dr. Myles Munroe'}</span><span class="dot"></span><span>${m.words ? `${fmt.compact(m.words)} words` : "Message"}</span></div>
       ${topics ? `<div class="card-topics">${topics}</div>` : ""}
     </div>
   </article>`;

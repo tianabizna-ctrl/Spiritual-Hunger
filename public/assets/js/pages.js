@@ -420,6 +420,7 @@ export async function collectionPage(slug) {
   const c = collectionBySlug(slug, collections);
   if (!c) return notFoundPage("We could not find that collection.");
   const items = sortMessages(index.filter((m) => m.collections.includes(slug)), "title");
+  if (c.playlistOrder) items.sort((a, b) => c.playlistOrder.indexOf(a.id) - c.playlistOrder.indexOf(b.id));
   const counts = topicCounts(items);
   const topics = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
   const hours = Math.round(items.reduce((s, m) => s + m.minutes, 0) / 60);
@@ -442,6 +443,8 @@ export async function collectionPage(slug) {
       <div>
         <h1>${esc(c.name)}</h1>
         <p>${fmt.number(items.length)} messages · ${fmt.number(hours)} hours of reading · ${esc(c.blurb)}</p>
+        ${c.playlistId ? `<p><a href="#/devotionals/${c.devotional}">Read the collection devotional</a> · <a href="https://www.youtube.com/playlist?list=${c.playlistId}">YouTube playlist</a> · ${items.length} of ${c.playlistOrder.length} entries available</p>` : ""}
+        ${c.playlistOrder?.length > items.length ? `<details><summary>Unavailable playlist entries</summary><ol>${c.playlistOrder.map((id, i) => items.some(m => m.id === id) ? "" : `<li value="${i + 1}"><a href="https://www.youtube.com/watch?v=${esc(id)}">${esc(id)}</a> · Video unavailable on YouTube</li>`).join("")}</ol></details>` : ""}
       </div>
       <a class="link-arrow" href="#/library?c=${encodeURIComponent(slug)}">Open in library ${icon("arrowRight")}</a>
     </div>
@@ -491,7 +494,7 @@ export async function readerPage(id) {
             <span class="eyebrow">${esc(collectionName(doc.collection))}</span>
             <h1 class="reader-title">${esc(doc.title)}</h1>
             <div class="reader-meta">
-              <span>${doc.collection === 'selman' ? 'Joshua Selman collection' : 'Dr. Myles Munroe'}</span><span class="dot"></span>
+              <span>${['selman','feeling-lost','morning-prayer'].includes(doc.collection) ? 'Joshua Selman collection' : 'Dr. Myles Munroe'}</span><span class="dot"></span>
               <span>${fmt.minutes(doc.minutes)}</span><span class="dot"></span>
               <span>${fmt.number(doc.words)} words</span><span class="dot"></span>
               <span>${doc.kind === "prayer" ? "Prayer & worship" : "Teaching"}</span>
@@ -526,6 +529,7 @@ export async function readerPage(id) {
         </div>
       </article>
       <aside class="reader-sidebar">
+        ${text.practice ? `<div class="sidebar-card"><span class="eyebrow">Devotional practice</span><p>${esc(text.practice)}</p><a href="#/devotionals/${id === 'LtUd_MuMx7Y' ? 'held-in-the-waiting' : collections.find(c => c.devotional && doc.collections.includes(c.slug)).devotional}">Read the devotional</a></div>` : ""}
         <div class="sidebar-card">
           <div class="reader-thumb">
             ${image(id, { alt: doc.title, size: "hq" })}

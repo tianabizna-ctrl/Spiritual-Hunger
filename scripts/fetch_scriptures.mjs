@@ -26,6 +26,7 @@ const devotional = [
   "Mark 10:42-45", "Mark 4:39", "Proverbs 24:3-4", "Psalm 91:1", "1 Peter 4:10",
   "Micah 6:8", "Psalm 23:5", "2 Corinthians 9:6-8", "Proverbs 4:23",
   "Isaiah 30:18", "1 Kings 19:19-21", "Matthew 5:14-16",
+  "1 John 3:1", "Psalm 13:1-6", "Psalm 5:1-3",
 ];
 
 const prayer = [

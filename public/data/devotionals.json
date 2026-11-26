@@ -832,5 +832,101 @@
         "collection": "media-content"
       }
     ]
+  },
+  {
+    "day": 22,
+    "slug": "held-in-the-waiting",
+    "series": "Feeling lost",
+    "title": "Held in the Waiting",
+    "subtitle": "A name for the morning after disappointment.",
+    "scripture": {
+      "ref": "1 John 3:1",
+      "text": "Behold, what manner of love the Father hath bestowed upon us, that we should be called the sons of God: therefore the world knoweth us not, because it knew him not."
+    },
+    "reflection": [
+      "There is a difference between saying ‘I haven’t found work’ and saying ‘I’m no good to anyone.’ The first names a hard thing that has happened. The second lets that hard thing give you a name. Early in this sermon, Joshua Selman describes someone who has heard that second sentence so often that even an invitation from the king sounds as though it must be meant for somebody else.",
+      "John asks us to pause over the name God gives us: his children. You can read that verse on the morning after another rejection. The rejection is real. So is the invitation to belong. You don’t have to make the first hurt less before you can receive the second."
+    ],
+    "prayer": "Father, you know the words I use against myself when I am tired. Help me hear what you call me. Give me courage to receive the care you offer today, including the kindness of the person beside me. Amen.",
+    "practice": "Write one honest sentence beginning ‘Today I feel…’ Beneath it, write ‘Even here, I am loved.’ If words are hard to find, ask someone you trust to sit with you and read 1 John 3:1 aloud.",
+    "topics": [
+      "Identity",
+      "Faith"
+    ],
+    "related": [
+      {
+        "id": "LtUd_MuMx7Y",
+        "title": "WHAT TO DO WHEN YOU ARE SAD,FRUSTRATED,DEPRESSED AND THINKING SUICIDE | APOSTLE JOSHUA SELMAN",
+        "collection": "feeling-lost"
+      }
+    ],
+    "quote": null
+  },
+  {
+    "day": 23,
+    "slug": "a-prayer-with-room-for-a-question",
+    "series": "Feeling lost",
+    "title": "A Prayer With Room for a Question",
+    "subtitle": "An honest question can be the beginning of prayer.",
+    "scripture": {
+      "ref": "Psalm 13:1-6",
+      "text": "How long wilt thou forget me, O LORD? for ever? how long wilt thou hide thy face from me? How long shall I take counsel in my soul, having sorrow in my heart daily? how long shall mine enemy be exalted over me? Consider and hear me, O LORD my God: lighten mine eyes, lest I sleep the sleep of death; Lest mine enemy say, I have prevailed against him; and those that trouble me rejoice when I am moved. But I have trusted in thy mercy; my heart shall rejoice in thy salvation. I will sing unto the LORD, because he hath dealt bountifully with me."
+    },
+    "reflection": [
+      "David begins with a question: how long? He comes back to it four times. If the only words you have today are a question you have asked before, you already have the beginning of a prayer.",
+      "Notice that David addresses God even before he can see an answer. He does not have to settle his feelings before speaking. What question have you stopped asking aloud?"
+    ],
+    "prayer": "Lord, meet me in the question I still carry. Help me receive the company of someone who can listen today. Amen.",
+    "practice": "Bring the question to God in one plain sentence. Leave room for silence after it.",
+    "topics": [
+      "Faith",
+      "Prayer"
+    ],
+    "related": [
+      {
+        "id": "CsYz9JrXK80",
+        "title": "TRUSTING GOD IS NOT EASY: CHEER UP IF YOU HAVE BEEN CRYING - Apostle Joshua Selman",
+        "collection": "feeling-lost"
+      },
+      {
+        "id": "rBvwxp1wR_Q",
+        "title": "WHAT TO DO WHEN YOU FEEL YOU'RE LOSING HOPE IN LIFE - APOSTLE JOSHUA SELMAN",
+        "collection": "feeling-lost"
+      }
+    ],
+    "quote": null
+  },
+  {
+    "day": 24,
+    "slug": "before-the-day-asks-anything",
+    "series": "Morning Prayer",
+    "title": "Before the Day Asks Anything of You",
+    "subtitle": "Make room for the first sigh of the morning.",
+    "scripture": {
+      "ref": "Psalm 5:1-3",
+      "text": "Give ear to my words, O LORD, consider my meditation. Hearken unto the voice of my cry, my King, and my God: for unto thee will I pray. My voice shalt thou hear in the morning, O LORD; in the morning will I direct my prayer unto thee, and will look up."
+    },
+    "reflection": [
+      "Before the psalmist begins to watch and wait, he asks God to listen. His prayer makes room for a sigh as well as for words. Before you reach for the news or rehearse your first difficult conversation, try giving that first sigh of the day to God."
+    ],
+    "prayer": "God of this ordinary morning, hear what I can say and what I cannot. Give me patience with the first person who needs my attention. Amen.",
+    "practice": "Name one person you expect to meet today. What act of kindness could become your answer to this morning’s prayer?",
+    "topics": [
+      "Prayer",
+      "Grace"
+    ],
+    "related": [
+      {
+        "id": "dCsXQFp5g9Q",
+        "title": "10 Minutes Powerful Morning Prayer Before You Start Your Day | Apostle Joshua Selman",
+        "collection": "morning-prayer"
+      },
+      {
+        "id": "1ClOYlFD3l0",
+        "title": "FATHER GOD, THANK YOU FOR THE GIFT OF A NEW DAY | APOSTLE JOSHUA SELMAN",
+        "collection": "morning-prayer"
+      }
+    ],
+    "quote": null
   }
 ]

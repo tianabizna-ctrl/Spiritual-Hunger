@@ -20,6 +20,7 @@ const SRC = path.join(ROOT, ".sources");
 const OUT = path.join(ROOT, "public", "data");
 const TEXT_OUT = path.join(OUT, "texts");
 const CONTENT = path.join(ROOT, "content");
+const selmanPlaylists = JSON.parse(await readFile(path.join(CONTENT, "selman-playlists.json"), "utf8"));
 
 const COLLECTIONS = [
   { slug: "media-content", name: "Media Content", blurb: "The flagship archive of full-length teachings, interviews and special messages.", accent: "gold" },
@@ -36,6 +37,7 @@ const COLLECTIONS = [
   { slug: "available", name: "Available Teachings", blurb: "The wide catch-all archive — a cross-section of the entire ministry.", accent: "violet" },
   { slug: "short-messages", name: "Short Messages", blurb: "Brief, concentrated words for the day.", accent: "rose" },
   { slug: "selman", name: "SELMAN", blurb: "The SELMAN playlist: teachings gathered from the full series.", accent: "ocean" },
+  ...selmanPlaylists.map(({ videos, ...collection }) => ({ ...collection, playlistOrder: videos.map(v => v.id) })),
 ];
 
 const COLLECTION_TOPIC = {
@@ -53,6 +55,8 @@ const COLLECTION_TOPIC = {
   general: "Faith",
   "short-messages": "Spiritual Growth",
   selman: "Faith",
+  "feeling-lost": "Faith",
+  "morning-prayer": "Prayer",
 };
 
 const TOPICS = {
@@ -274,6 +278,17 @@ const sha = (s) => {
 
 async function main() {
   const manifest = JSON.parse(await readFile(path.join(SRC, "manifest.json"), "utf8"));
+  const byId = new Map(manifest.map(r => [r.id, r]));
+  const practices = new Map();
+  for (const playlist of selmanPlaylists) {
+    for (const video of playlist.videos) {
+      if (!video.title) continue;
+      const rec = byId.get(video.id) || { id: video.id, title: video.title, collections: [] };
+      if (!rec.collections.includes(playlist.slug)) rec.collections.push(playlist.slug);
+      byId.set(video.id, rec);
+      practices.set(video.id, video.practice);
+    }
+  }
   await mkdir(TEXT_OUT, { recursive: true });
   await rm(TEXT_OUT, { recursive: true, force: true });
   await mkdir(TEXT_OUT, { recursive: true });
@@ -284,7 +299,7 @@ async function main() {
   const termMap = new Map();
   const quoteSources = new Map();
 
-  for (const rec of manifest) {
+  for (const rec of byId.values()) {
     if (!rec.collections.some(slug => COLLECTIONS.some(c => c.slug === slug))) continue;
     const file = path.join(SRC, "transcripts", `${rec.id}.json`);
     if (!existsSync(file)) { skipped.push({ id: rec.id, reason: "missing" }); continue; }
@@ -340,6 +355,7 @@ async function main() {
       collection: doc.collection,
       topics: doc.topics,
       paragraphs: paras,
+      practice: practices.get(doc.id),
       scriptureRefs: refs,
       words: wc,
       minutes: readMinutes,
