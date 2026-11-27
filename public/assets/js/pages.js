@@ -1,15 +1,15 @@
 /* Page renderers. Each returns { title, content, mount?, cleanup? }. */
 
-import { icon, TOPIC_ICONS } from "./icons.js?v=20261127-2";
+import { icon, TOPIC_ICONS } from "./icons.js?v=20261127-3";
 import {
   header, footer, pageHero, sectionHead, messageCard, devotionalCard,
-  collectionCard, emptyState, quoteBand, collectionName, sourceLabel, topicIcon,
-} from "./components.js?v=20261127-2";
+  collectionCard, emptyState, quoteBand, collectionName, sourceLabel, topicIcon, mediaHtml,
+} from "./components.js?v=20261127-3";
 import {
   data, fmt, esc, image, dailyIndex, relatedMessages, topicCounts,
   collectionBySlug, searchMessages, snippetFor,
-} from "./data.js?v=20261127-2";
-import { store } from "./store.js?v=20261127-2";
+} from "./data.js?v=20261127-3";
+import { store } from "./store.js?v=20261127-3";
 
 const collectionOptions = (collections) => collections.filter((c) => c.count > 0);
 
@@ -520,7 +520,7 @@ export async function readerPage(id) {
             </div>
             <button class="btn-icon${saved ? " is-active" : ""}" type="button" data-save="${esc(id)}" aria-pressed="${saved}" aria-label="${saved ? "Remove bookmark" : "Bookmark this message"}">${icon(saved ? "bookmarkFill" : "bookmark")}</button>
             <button class="btn-icon" type="button" data-share data-title="${esc(doc.title)}" aria-label="Share this message">${icon("share")}</button>
-            <a class="btn-icon" href="${source}" target="_blank" rel="noopener noreferrer" aria-label="Watch the original message on YouTube">${icon("youtube")}</a>
+            <a class="btn-icon" href="${source}" target="_blank" rel="noopener noreferrer" aria-label="Open the original post">${icon(doc.origin === "facebook" ? "external" : "youtube")}</a>
           </div>
         </div>
       </div>
@@ -536,20 +536,23 @@ export async function readerPage(id) {
             ${related[0] ? `<a class="btn btn-primary" href="#/read/${encodeURIComponent(related[0].id)}">Read next ${icon("arrowRight")}</a>` : ""}
             <a class="btn btn-outline" href="#/library">Browse the library</a>
           </div>
-          <p class="reader-source-note">${text.translated ? 'These captions are machine-translated into English.' : 'This transcript comes from public YouTube captions.'} Check the original recording for wording. <a href="${source}" target="_blank" rel="noopener noreferrer">Watch “${esc(doc.title)}” on YouTube ${icon("external")}</a>.</p>
+          <p class="reader-source-note">${doc.origin === "facebook"
+            ? "This study comes from a public Facebook post, reproduced with the social-media calls to action and promotions removed."
+            : (text.translated ? "These captions are machine-translated into English." : "This transcript comes from public YouTube captions.")}
+            Check the original for wording. <a href="${source}" target="_blank" rel="noopener noreferrer">${doc.origin === "facebook" ? "Read the original post on Facebook" : `Watch “${esc(doc.title)}” on YouTube`} ${icon("external")}</a>.</p>
         </div>
       </article>
       <aside class="reader-sidebar">
         ${text.practice ? `<div class="sidebar-card"><span class="eyebrow">Devotional practice</span><p>${esc(text.practice)}</p><a href="#/devotionals/${id === 'LtUd_MuMx7Y' ? 'held-in-the-waiting' : collections.find(c => c.devotional && doc.collections.includes(c.slug)).devotional}">Read the devotional</a></div>` : ""}
         <div class="sidebar-card">
           <div class="reader-thumb">
-            ${image(id, { alt: doc.title, size: "hq" })}
-            <a href="${source}" target="_blank" rel="noopener noreferrer" aria-label="Watch the original message"><span class="play">${icon("play")}</span></a>
+            ${mediaHtml(doc, { alt: doc.title, size: "hq" })}
+            ${doc.thumb === "" ? "" : `<a href="${source}" target="_blank" rel="noopener noreferrer" aria-label="Watch the original message"><span class="play">${icon("play")}</span></a>`}
           </div>
           <div class="source-title">${esc(doc.title)}</div>
           <div class="source-sub">${esc(collectionName(doc.collection))} · ${fmt.minutes(doc.minutes)}</div>
           <div class="sidebar-actions">
-            <a class="btn btn-primary btn-sm" href="${source}" target="_blank" rel="noopener noreferrer">Watch source ${icon("external")}</a>
+            <a class="btn btn-primary btn-sm" href="${source}" target="_blank" rel="noopener noreferrer">${doc.origin === "facebook" ? "Read source" : "Watch source"} ${icon("external")}</a>
             ${progress && progress.pct > 2 ? `<button class="btn btn-outline btn-sm" type="button" data-resume="${progress.pct}">Resume ${progress.pct}%</button>` : ""}
           </div>
         </div>
@@ -560,7 +563,7 @@ export async function readerPage(id) {
         <div class="sidebar-card">
           <h4>Related messages</h4>
           <div class="related-list">
-            ${related.map((m) => `<a class="related-item" href="#/read/${encodeURIComponent(m.id)}">${image(m.id, { alt: m.title })}<div><div class="rt">${esc(m.title)}</div><div class="rc">${esc(collectionName(m.collection))}</div></div></a>`).join("")}
+            ${related.map((m) => `<a class="related-item" href="#/read/${encodeURIComponent(m.id)}">${mediaHtml(m, { alt: m.title })}<div><div class="rt">${esc(m.title)}</div><div class="rc">${esc(collectionName(m.collection))}</div></div></a>`).join("")}
           </div>
         </div>
         <div class="sidebar-card">

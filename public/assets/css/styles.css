@@ -934,6 +934,26 @@ figure, blockquote { margin: 0; }
   background: linear-gradient(180deg, rgba(8, 19, 16, 0.06), transparent 45%, rgba(8, 19, 16, 0.4));
   pointer-events: none;
 }
+/* typographic placeholder for messages without a video thumbnail */
+.card-media-ph {
+  width: 100%; height: 100%;
+  display: grid; place-items: center;
+  background:
+    radial-gradient(120% 90% at 20% 0%, color-mix(in srgb, var(--accent-gold, #c9a24b) 26%, transparent), transparent 60%),
+    linear-gradient(160deg, #10251e, #0a1713);
+  color: rgba(247, 241, 230, 0.85);
+  border: 1px solid var(--line);
+}
+.card-media-ph svg { width: 34px; height: 34px; opacity: 0.8; }
+.card-media-ph[data-accent="rose"] { background: radial-gradient(120% 90% at 20% 0%, rgba(196, 122, 106, 0.3), transparent 60%), linear-gradient(160deg, #251a17, #170f0d); }
+.card-media-ph[data-accent="violet"] { background: radial-gradient(120% 90% at 20% 0%, rgba(139, 116, 196, 0.3), transparent 60%), linear-gradient(160deg, #1c1830, #110e1e); }
+.card-media-ph[data-accent="ocean"] { background: radial-gradient(120% 90% at 20% 0%, rgba(96, 145, 158, 0.3), transparent 60%), linear-gradient(160deg, #12242a, #0c161a); }
+.card-media-ph[data-accent="sage"] { background: radial-gradient(120% 90% at 20% 0%, rgba(139, 158, 110, 0.28), transparent 60%), linear-gradient(160deg, #1a241a, #101710); }
+.reader-thumb .card-media-ph { border-radius: 10px; }
+.related-item .card-media-ph { width: 74px; height: 46px; border-radius: 6px; flex: none; }
+.related-item .card-media-ph svg { width: 18px; height: 18px; }
+.collection-thumbs .card-media-ph { width: 100%; height: 100%; }
+.collection-thumbs .card-media-ph svg { width: 22px; height: 22px; }
 .card-badge {
   position: absolute;
   z-index: 2;

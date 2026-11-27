@@ -273,6 +273,27 @@
     ]
   },
   {
+    "slug": "gospel-warrior",
+    "name": "Gospel Warrior",
+    "blurb": "Public Facebook studies from Gospel Warrior, cleaned of calls to action and promotions.",
+    "accent": "rose",
+    "count": 5,
+    "thumbs": [
+      {
+        "id": "fb-ev50y1",
+        "title": "God restricted the physically imperfect from his altar… but then jesus touched the very people the world…"
+      },
+      {
+        "id": "fb-ccyi0p",
+        "title": "He only touched a bed… and god declared him unclean."
+      },
+      {
+        "id": "fb-6l9hae",
+        "title": "The storm may be louder than your prayers, but it will never be stronger than the God who hears them."
+      }
+    ]
+  },
+  {
     "slug": "feeling-lost",
     "name": "Feeling lost",
     "blurb": "Messages for seasons of discouragement, grief and uncertainty.",

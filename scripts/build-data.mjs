@@ -21,6 +21,8 @@ const OUT = path.join(ROOT, "public", "data");
 const TEXT_OUT = path.join(OUT, "texts");
 const CONTENT = path.join(ROOT, "content");
 const selmanPlaylists = JSON.parse(await readFile(path.join(CONTENT, "selman-playlists.json"), "utf8"));
+const gospelWarrior = JSON.parse(await readFile(path.join(CONTENT, "gospel-warrior.json"), "utf8"));
+const fbPosts = new Map(gospelWarrior.posts.map((p) => [p.id, p]));
 
 const COLLECTIONS = [
   { slug: "media-content", name: "Media Content", blurb: "The flagship archive of full-length teachings, interviews and special messages.", accent: "gold" },
@@ -36,6 +38,7 @@ const COLLECTIONS = [
   { slug: "general", name: "General Teachings", blurb: "A small gathering of essential messages outside the main themes.", accent: "ocean" },
   { slug: "available", name: "Available Teachings", blurb: "The wide catch-all archive — a cross-section of the entire ministry.", accent: "violet" },
   { slug: "short-messages", name: "Short Messages", blurb: "Brief, concentrated words for the day.", accent: "rose" },
+  { slug: "gospel-warrior", name: "Gospel Warrior", blurb: "Public Facebook studies from Gospel Warrior, cleaned of calls to action and promotions.", accent: "rose" },
   ...selmanPlaylists.map(({ videos, ...collection }) => ({ ...collection, playlistOrder: videos.map(v => v.id) })),
 ];
 
@@ -53,6 +56,7 @@ const COLLECTION_TOPIC = {
   available: "Spiritual Growth",
   general: "Faith",
   "short-messages": "Spiritual Growth",
+  "gospel-warrior": "Faith",
   selman: "Faith",
   "feeling-lost": "Faith",
   "morning-prayer": "Prayer",
@@ -279,6 +283,9 @@ const sha = (s) => {
 async function main() {
   const manifest = JSON.parse(await readFile(path.join(SRC, "manifest.json"), "utf8"));
   const byId = new Map(manifest.map(r => [r.id, r]));
+  for (const post of gospelWarrior.posts) {
+    byId.set(post.id, { id: post.id, title: post.title, collections: ["gospel-warrior"] });
+  }
   const practices = new Map();
   for (const playlist of selmanPlaylists) {
     for (const video of playlist.videos) {
@@ -302,11 +309,17 @@ async function main() {
 
   for (const rec of byId.values()) {
     if (!rec.collections.some(slug => COLLECTIONS.some(c => c.slug === slug))) continue;
-    const file = path.join(SRC, "transcripts", `${rec.id}.json`);
-    if (!existsSync(file)) { skipped.push({ id: rec.id, reason: "missing" }); continue; }
+    const fb = fbPosts.get(rec.id);
     let raw;
-    try { raw = JSON.parse(await readFile(file, "utf8")); } catch { skipped.push({ id: rec.id, reason: "unreadable" }); continue; }
-    if (!raw.text || raw.chars < 300) { skipped.push({ id: rec.id, reason: "empty" }); continue; }
+    if (fb) {
+      const text = fb.paragraphs.join(" ");
+      raw = { text, chars: text.length, title: rec.title || fb.title, duration: 0 };
+    } else {
+      const file = path.join(SRC, "transcripts", `${rec.id}.json`);
+      if (!existsSync(file)) { skipped.push({ id: rec.id, reason: "missing" }); continue; }
+      try { raw = JSON.parse(await readFile(file, "utf8")); } catch { skipped.push({ id: rec.id, reason: "unreadable" }); continue; }
+    }
+    if (!raw.text || (fb ? raw.chars < 40 : raw.chars < 300)) { skipped.push({ id: rec.id, reason: "empty" }); continue; }
 
     let text = cleanText(raw.text);
     let paras = toParagraphs(text);
@@ -341,10 +354,12 @@ async function main() {
       chars: allText.length,
       scriptureRefs: refs,
       excerpt,
-      thumb: `https://i.ytimg.com/vi/${rec.id}/hqdefault.jpg`,
-      thumbMax: `https://i.ytimg.com/vi/${rec.id}/maxresdefault.jpg`,
+      thumb: fb ? "" : `https://i.ytimg.com/vi/${rec.id}/hqdefault.jpg`,
+      thumbMax: fb ? "" : `https://i.ytimg.com/vi/${rec.id}/maxresdefault.jpg`,
       duration: raw.duration || 0,
-      source: `https://www.youtube.com/watch?v=${rec.id}`,
+      source: fb ? fb.source : `https://www.youtube.com/watch?v=${rec.id}`,
+      origin: fb ? "facebook" : "youtube",
+      postedAgo: fb ? fb.postedAgo : undefined,
       accent: COLLECTIONS.find((c) => c.slug === collection)?.accent || "gold",
     };
     index.push(doc);

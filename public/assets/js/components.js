@@ -1,8 +1,8 @@
 /* Shared view components. */
 
-import { icon, logoMark, TOPIC_ICONS } from "./icons.js?v=20261127-2";
-import { esc, fmt, image, thumb } from "./data.js?v=20261127-2";
-import { store } from "./store.js?v=20261127-2";
+import { icon, logoMark, TOPIC_ICONS } from "./icons.js?v=20261127-3";
+import { esc, fmt, image, thumb } from "./data.js?v=20261127-3";
+import { store } from "./store.js?v=20261127-3";
 
 export const COLLECTION_NAMES = {
   "media-content": "Media Content",
@@ -27,6 +27,7 @@ export const COLLECTION_NAMES = {
   "holy-spirit": "The Holy Spirit",
   "powerful-prayers": "Powerful Prayers",
   "grace-enclave-mornings": "Grace Enclave: Morning Prayers",
+  "gospel-warrior": "Gospel Warrior",
 };
 
 export function collectionName(slug) {
@@ -41,8 +42,17 @@ const MUNROE_COLLECTIONS = new Set([
 
 export function sourceLabel(message) {
   if (MUNROE_COLLECTIONS.has(message.collection)) return 'Dr. Myles Munroe';
+  if (message.collection === "gospel-warrior") return 'Gospel Warrior · Facebook';
   if (message.channel) return `Channel: ${message.channel}`;
   return ['selman', 'feeling-lost', 'morning-prayer'].includes(message.collection) ? 'Joshua Selman collection' : 'Ministry collection';
+}
+
+/* Thumbnail for YouTube-backed messages; a typographic placeholder otherwise. */
+export function mediaHtml(m, { size = "hq", alt = "", className = "" } = {}) {
+  if (m && m.thumb === "") {
+    return `<div class="card-media-ph${className ? ` ${className}` : ""}" data-accent="${esc(m.accent || "gold")}" aria-hidden="true">${icon("bookOpen")}</div>`;
+  }
+  return image(m.id, { size, alt, className });
 }
 
 export function topicIcon(topic) {
@@ -178,7 +188,7 @@ export function messageCard(m) {
   const kind = m.kind === "prayer" ? "Prayer" : "Teaching";
   return `<article class="message-card" data-message="${esc(m.id)}">
     <a class="card-media" href="#/read/${encodeURIComponent(m.id)}" aria-label="Read ${esc(m.title)}">
-      ${image(m.id, { alt: m.title, size: "hq" })}
+      ${mediaHtml(m, { alt: m.title, size: "hq" })}
       <span class="card-badge${m.kind === "prayer" ? " prayer" : ""}">${icon(m.kind === "prayer" ? "flame" : "bookOpen")}${kind}</span>
     </a>
     <button class="card-save${saved ? " is-saved" : ""}" type="button" data-save="${esc(m.id)}" aria-pressed="${saved}" aria-label="${saved ? "Remove bookmark" : "Bookmark this message"}">
@@ -206,7 +216,7 @@ export function devotionalCard(d) {
 }
 
 export function collectionCard(c) {
-  const thumbs = (c.thumbs || []).slice(0, 3).map((t) => `<div>${image(t.id, { alt: t.title, size: "hq" })}</div>`).join("");
+  const thumbs = (c.thumbs || []).slice(0, 3).map((t) => `<div>${mediaHtml(t, { alt: t.title, size: "hq" })}</div>`).join("");
   const count = c.playlistId ? `${fmt.number(c.playlistOrder?.length || c.count)} entries` : `${fmt.number(c.count)} messages`;
   return `<a class="collection-card" href="#/collections/${encodeURIComponent(c.slug)}">
     <div class="collection-thumbs">${thumbs || `<div></div><div></div><div></div>`}</div>
