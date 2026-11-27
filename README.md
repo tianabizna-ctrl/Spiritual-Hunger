@@ -18,6 +18,8 @@ The collections page also includes **Powerful Prayers** (194 entries) and **Grac
 
 Open **Playlist contents in source order** within a collection for its complete list. Shared videos use the same reader and bookmark across collections. Channel credits identify the uploader, which can differ from the speaker.
 
+The **Gospel Warrior** collection holds public posts from [facebook.com/iamGospelWarrior](https://www.facebook.com/iamGospelWarrior), captured from the page's public embed (the only part of Facebook reachable without a login) and cleaned of social-media calls to action, subscription and product promotions. To refresh it, save the public embed output to `.sources/facebook/raw.md`, run `node scripts/build-facebook.mjs`, then `node scripts/build-data.mjs`. The full post history since 2020 is not publicly reachable without a logged-in session or an official export from the page owner.
+
 ## YouTube playlist skill for Arena AI
 
 [Download the fetching skill and Python scripts](https://tianabizna-ctrl.github.io/Spiritual-Hunger/downloads/youtube-transcript-library.zip), or use the local copy at `public/downloads/youtube-transcript-library.zip`. Extract it and open `ARENA.md` for the paste-ready prompt. The toolkit checks YouTube access, lists playlist entries, downloads captions and verifies transcript files. If your Arena workspace cannot reach YouTube, upload the fetched JSON instead. No video downloads are needed.
@@ -32,4 +34,4 @@ Open `http://localhost:8000`. No package installation or build is needed. The ch
 
 ## Data pipeline
 
-`scripts/enumerate.py` lists the original playlists; `scripts/build_manifest.py` deduplicates them. `scripts/fetch_transcripts.py` collects available English captions using yt-dlp and Python requests. Raw inputs are cached locally in `.sources/`. With those inputs present, `node scripts/build-data.mjs` regenerates the reader files and search index. Devotional and prayer texts live in `content/`.
+`scripts/enumerate.py` lists the original playlists; `scripts/build_manifest.py` deduplicates them. `scripts/fetch_transcripts.py` collects available English captions using yt-dlp and Python requests. `scripts/build-facebook.mjs` cleans the public Facebook feed into `content/gospel-warrior.json`. Raw inputs are cached locally in `.sources/`. With those inputs present, `node scripts/build-data.mjs` regenerates the reader files and search index. Devotional and prayer texts live in `content/`.
