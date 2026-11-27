@@ -4,7 +4,7 @@ const cache = new Map();
 
 async function getJSON(path) {
   if (!cache.has(path)) {
-    const promise = fetch(new URL(`data/${path}`, document.baseURI), { cache: "force-cache" })
+    const promise = fetch(new URL(`data/${path}`, document.baseURI), { cache: "no-cache" })
       .then((res) => {
         if (!res.ok) throw new Error(`Could not load ${path} (${res.status})`);
         return res.json();

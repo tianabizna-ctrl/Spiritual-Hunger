@@ -1,15 +1,15 @@
 /* Page renderers. Each returns { title, content, mount?, cleanup? }. */
 
-import { icon, TOPIC_ICONS } from "./icons.js";
+import { icon, TOPIC_ICONS } from "./icons.js?v=20261127-2";
 import {
   header, footer, pageHero, sectionHead, messageCard, devotionalCard,
   collectionCard, emptyState, quoteBand, collectionName, sourceLabel, topicIcon,
-} from "./components.js";
+} from "./components.js?v=20261127-2";
 import {
   data, fmt, esc, image, dailyIndex, relatedMessages, topicCounts,
   collectionBySlug, searchMessages, snippetFor,
-} from "./data.js";
-import { store } from "./store.js";
+} from "./data.js?v=20261127-2";
+import { store } from "./store.js?v=20261127-2";
 
 const collectionOptions = (collections) => collections.filter((c) => c.count > 0);
 

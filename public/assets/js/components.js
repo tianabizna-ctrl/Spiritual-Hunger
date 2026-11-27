@@ -1,8 +1,8 @@
 /* Shared view components. */
 
-import { icon, logoMark, TOPIC_ICONS } from "./icons.js";
-import { esc, fmt, image, thumb } from "./data.js";
-import { store } from "./store.js";
+import { icon, logoMark, TOPIC_ICONS } from "./icons.js?v=20261127-2";
+import { esc, fmt, image, thumb } from "./data.js?v=20261127-2";
+import { store } from "./store.js?v=20261127-2";
 
 export const COLLECTION_NAMES = {
   "media-content": "Media Content",
