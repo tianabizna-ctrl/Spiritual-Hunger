@@ -409,7 +409,7 @@ async function main() {
       ...c,
       sourceOnly: playlist && Object.fromEntries(playlist.videos.filter(v => !readable.has(v.id)).map(v => [v.id, {title: v.title, availability: v.availability}])),
       count: items.length,
-      thumbs: items.slice(0, 3).map((m) => ({ id: m.id, title: m.title })),
+      thumbs: items.slice(0, 3).map((m) => ({ id: m.id, title: m.title, thumb: m.thumb, accent: m.accent })),
     };
   });
 
