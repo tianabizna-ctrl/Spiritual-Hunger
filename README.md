@@ -18,7 +18,9 @@ The collections page also includes **Powerful Prayers** (194 entries) and **Grac
 
 Open **Playlist contents in source order** within a collection for its complete list. Shared videos use the same reader and bookmark across collections. Channel credits identify the uploader, which can differ from the speaker.
 
-The **Gospel Warrior** collection holds public posts from [facebook.com/iamGospelWarrior](https://www.facebook.com/iamGospelWarrior), captured from the page's public embed (the only part of Facebook reachable without a login) and cleaned of social-media calls to action, subscription and product promotions. To refresh it, save the public embed output to `.sources/facebook/raw.md`, run `node scripts/build-facebook.mjs`, then `node scripts/build-data.mjs`. The full post history since 2020 is not publicly reachable without a logged-in session or an official export from the page owner.
+The [Gospel Warrior collection](https://tianabizna-ctrl.github.io/Spiritual-Hunger/#/collections/gospel-warrior) includes studies and short declarations by [John Domino Sanchez Asis](https://www.facebook.com/iamGospelWarrior). The importer reads the public timeline embed and follows photo links visible on the mobile profile to their public post embeds. Some photo captions contain complete studies. The album's item count is a count of photos, not studies; Facebook asks for login beyond the public preview. These sources do not establish complete coverage back to 2020.
+
+To refresh, run `node scripts/build-facebook.mjs --refresh`, then `node scripts/build-data.mjs`. The first command saves captures under `.sources/facebook/snapshots/` and merges complete posts into `content/gospel-warrior.json`; old entries keep their reader and bookmark IDs. Repeated imports match by post link when available or by the full source text. You can also pass paths to saved timeline or photo-embed Markdown captures. Review new titles and text for promotions before publishing. Refreshes are manual and can miss posts between captures.
 
 ## YouTube playlist skill for Arena AI
 

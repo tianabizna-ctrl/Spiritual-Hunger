@@ -319,16 +319,19 @@ async function main() {
       if (!existsSync(file)) { skipped.push({ id: rec.id, reason: "missing" }); continue; }
       try { raw = JSON.parse(await readFile(file, "utf8")); } catch { skipped.push({ id: rec.id, reason: "unreadable" }); continue; }
     }
-    if (!raw.text || (fb ? raw.chars < 40 : raw.chars < 300)) { skipped.push({ id: rec.id, reason: "empty" }); continue; }
+    if (!raw.text || (!fb && raw.chars < 300)) { skipped.push({ id: rec.id, reason: "empty" }); continue; }
 
-    let text = cleanText(raw.text);
-    let paras = toParagraphs(text);
-    if (paras.length > 2 && /thank you for (joining|watching)|brought to you by|monroeglobal\.com|we transform followers|we turn followers/i.test(paras[0])) {
-      let drop = 1;
-      while (drop < 3 && /munroe global|monroeglobal|followers into leaders|followers into change|blessing to you|hope this message|agents of change/i.test(paras[drop] || "")) drop++;
-      if (drop < paras.length) paras = paras.slice(drop);
+    let paras = fb?.paragraphs;
+    if (!fb) {
+      const text = cleanText(raw.text);
+      paras = toParagraphs(text);
+      if (paras.length > 2 && /thank you for (joining|watching)|brought to you by|monroeglobal\.com|we transform followers|we turn followers/i.test(paras[0])) {
+        let drop = 1;
+        while (drop < 3 && /munroe global|monroeglobal|followers into leaders|followers into change|blessing to you|hope this message|agents of change/i.test(paras[drop] || "")) drop++;
+        if (drop < paras.length) paras = paras.slice(drop);
+      }
+      paras = capRepeats(deLoop(paras), words(text));
     }
-    paras = capRepeats(deLoop(paras), words(text));
     if (paras.length === 0) { skipped.push({ id: rec.id, reason: "empty-after-clean" }); continue; }
 
     const title = cleanTitle(raw.title || rec.title);
@@ -360,6 +363,7 @@ async function main() {
       source: fb ? fb.source : `https://www.youtube.com/watch?v=${rec.id}`,
       origin: fb ? "facebook" : "youtube",
       postedAgo: fb ? fb.postedAgo : undefined,
+      postedOn: fb?.postedOn,
       accent: COLLECTIONS.find((c) => c.slug === collection)?.accent || "gold",
     };
     index.push(doc);
