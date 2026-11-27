@@ -25,15 +25,24 @@ export const COLLECTION_NAMES = {
   mindset: "Mindset & Mind Transformation",
   "focus-on-god": "Focus on God",
   "holy-spirit": "The Holy Spirit",
+  "powerful-prayers": "Powerful Prayers",
+  "grace-enclave-mornings": "Grace Enclave: Morning Prayers",
 };
 
 export function collectionName(slug) {
   return COLLECTION_NAMES[slug] || String(slug || "").replace(/-/g, " ").replace(/\b\w/g, ch => ch.toUpperCase());
 }
 
+const MUNROE_COLLECTIONS = new Set([
+  "media-content", "animated", "prayer-fasting", "men-fatherhood", "marriage",
+  "success", "leadership", "kingdom", "purpose", "crisis", "general",
+  "available", "short-messages",
+]);
+
 export function sourceLabel(message) {
+  if (MUNROE_COLLECTIONS.has(message.collection)) return 'Dr. Myles Munroe';
   if (message.channel) return `Channel: ${message.channel}`;
-  return ['selman', 'feeling-lost', 'morning-prayer'].includes(message.collection) ? 'Joshua Selman collection' : 'Dr. Myles Munroe';
+  return ['selman', 'feeling-lost', 'morning-prayer'].includes(message.collection) ? 'Joshua Selman collection' : 'Ministry collection';
 }
 
 export function topicIcon(topic) {
@@ -198,11 +207,12 @@ export function devotionalCard(d) {
 
 export function collectionCard(c) {
   const thumbs = (c.thumbs || []).slice(0, 3).map((t) => `<div>${image(t.id, { alt: t.title, size: "hq" })}</div>`).join("");
+  const count = c.playlistId ? `${fmt.number(c.playlistOrder?.length || c.count)} entries` : `${fmt.number(c.count)} messages`;
   return `<a class="collection-card" href="#/collections/${encodeURIComponent(c.slug)}">
     <div class="collection-thumbs">${thumbs || `<div></div><div></div><div></div>`}</div>
     <div class="collection-head">
       <h3 class="collection-name">${esc(c.name)}</h3>
-      <span class="collection-count">${fmt.number(c.count)} messages</span>
+      <span class="collection-count">${count}</span>
     </div>
     <p class="collection-blurb">${esc(c.blurb)}</p>
     <div class="collection-foot"><span>Enter collection</span>${icon("arrowRight")}</div>

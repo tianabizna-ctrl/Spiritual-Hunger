@@ -14,7 +14,9 @@ The [Feeling lost](https://tianabizna-ctrl.github.io/Spiritual-Hunger/#/collecti
 
 The [collections page](https://tianabizna-ctrl.github.io/Spiritual-Hunger/#/collections) includes **Apostle Joshua Selman Messages**, **Prayer**, **Mindset & Mind Transformation**, **Recomfort**, **Brokenness**, **Spiritual Hunger**, **Focus on God**, **Spiritual Realm**, **Trusting God**, **Joshua Selman: December**, and **The Holy Spirit**. The 11 playlists contain 404 entries and 380 distinct video IDs. The first playlist is the existing 22-message Selman collection.
 
-Open **Playlist contents in source order** within a collection for its complete list. Of the 380 distinct videos, 355 have readable transcripts (316 new and 39 already in the library). YouTube lists 10 as private, 10 as removed, two as unavailable and one as members-only. One has no English captions, and another has only a short caption fragment. These entries are identified in the playlist. Shared videos use the same reader and bookmark across collections. Channel credits identify the uploader, which can differ from the speaker.
+The collections page also includes **Powerful Prayers** (194 entries) and **Grace Enclave: Morning Prayers** (141 entries), both with readers for every entry. Across all 15 playlists, 719 distinct videos are named; 714 have readable transcripts. The rest are identified in their playlist as private, removed, unavailable, members-only, or without usable English captions.
+
+Open **Playlist contents in source order** within a collection for its complete list. Shared videos use the same reader and bookmark across collections. Channel credits identify the uploader, which can differ from the speaker.
 
 ## YouTube playlist skill for Arena AI
 

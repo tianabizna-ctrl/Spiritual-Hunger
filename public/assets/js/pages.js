@@ -988,6 +988,8 @@ export async function prayerPage() {
 export async function collectionsPage() {
   const [collections, stats] = await Promise.all([data.collections(), data.stats()]);
   const active = collections.filter((c) => c.count > 0 || c.playlistId);
+  const archive = active.filter((c) => !c.playlistId);
+  const playlists = active.filter((c) => c.playlistId);
   const content = `${pageHero({
     eyebrow: "The collections",
     title: "Every room in the <em>house.</em>",
@@ -999,11 +1001,19 @@ export async function collectionsPage() {
     ],
     crumbs: [{ label: "Home", href: "#/" }, { label: "Collections" }],
   })}
-  <main id="main" class="section">
-    <div class="container">
-      ${sectionHead({ eyebrow: "Choose a room", title: "Where would you like to <em>begin?</em>", sub: "Each collection gathers messages that belong together. Start anywhere; the whole archive is open." })}
-      <div class="collection-grid">${active.map(collectionCard).join("")}</div>
-    </div>
+  <main id="main">
+    <section class="section">
+      <div class="container">
+        ${sectionHead({ eyebrow: "The Munroe archive", title: "Where would you like to <em>begin?</em>", sub: "The original teaching collections, gathered by theme. Start anywhere; the whole archive is open." })}
+        <div class="collection-grid">${archive.map(collectionCard).join("")}</div>
+      </div>
+    </section>
+    <section class="section-sm">
+      <div class="container">
+        ${sectionHead({ eyebrow: "Curated playlists", title: "Teachings in their <em>original order.</em>", sub: "Ministry playlists kept as they were published, alongside the readers available for each entry." })}
+        <div class="collection-grid">${playlists.map(collectionCard).join("")}</div>
+      </div>
+    </section>
   </main>`;
 
   return { title: pageTitle("Collections"), content };
