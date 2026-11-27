@@ -392,7 +392,7 @@ async function main() {
     const playlist = selmanPlaylists.find(p => p.slug === c.slug);
     return {
       ...c,
-      sourceOnlyTitles: playlist && Object.fromEntries(playlist.videos.filter(v => v.title && !readable.has(v.id)).map(v => [v.id, v.title])),
+      sourceOnly: playlist && Object.fromEntries(playlist.videos.filter(v => !readable.has(v.id)).map(v => [v.id, {title: v.title, availability: v.availability}])),
       count: items.length,
       thumbs: items.slice(0, 3).map((m) => ({ id: m.id, title: m.title })),
     };

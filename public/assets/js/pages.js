@@ -450,8 +450,11 @@ export async function collectionPage(slug) {
           <details class="playlist-contents"${readableEntries ? "" : " open"}><summary>Playlist contents in source order</summary><ol>${playlistOrder.map(id => {
             const message = readers.get(id);
             if (message) return `<li><a href="#/read/${encodeURIComponent(id)}">${esc(message.title)}</a></li>`;
-            const title = c.sourceOnlyTitles?.[id];
-            return `<li><a href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}">${esc(title || id)}</a> · ${title ? 'Source video only' : 'No public title or transcript'}</li>`;
+            const entry = c.sourceOnly?.[id];
+            if (entry?.availability === 'private' || entry?.availability === 'removed') return `<li>${entry.availability === 'private' ? 'Private video' : 'Removed video'} · ${esc(id)}</li>`;
+            const title = entry?.title || c.sourceOnlyTitles?.[id];
+            const reason = { 'members-only': 'Members-only video', unavailable: 'Video unavailable', 'short-caption': 'Caption too short for a reading', 'no-english-captions': 'No English captions' }[entry?.availability];
+            return `<li><a href="https://www.youtube.com/watch?v=${encodeURIComponent(id)}">${esc(title || id)}</a> · ${reason || (title ? 'Source video only' : 'No public title or transcript')}</li>`;
           }).join("")}</ol></details>` : ""}
       </div>
       <a class="link-arrow" href="#/library?c=${encodeURIComponent(slug)}">Open in library ${icon("arrowRight")}</a>

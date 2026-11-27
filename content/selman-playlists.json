@@ -274,7 +274,8 @@
         "practice": "Thank God for something specific enough that only you could name it: a familiar laugh, a meal someone saved, or a message that arrived in time. Who else deserves your thanks?"
       },
       {
-        "id": "FtCJB7bTrOA"
+        "id": "FtCJB7bTrOA",
+        "availability": "removed"
       },
       {
         "id": "PMeqY_LKAZI",
@@ -422,7 +423,8 @@
     "playlistId": "PL-7eNLWzLZIA4BBzyK5MEHFELv1n3IaaM",
     "videos": [
       {
-        "id": "hvL4o6HHuiY"
+        "id": "hvL4o6HHuiY",
+        "availability": "removed"
       },
       {
         "id": "-fZtpFhf1wY",
@@ -435,19 +437,24 @@
         "channel": "Triumphing Daily"
       },
       {
-        "id": "MZQvcu_NVJk"
+        "id": "MZQvcu_NVJk",
+        "availability": "removed"
       },
       {
-        "id": "FtCJB7bTrOA"
+        "id": "FtCJB7bTrOA",
+        "availability": "removed"
       },
       {
-        "id": "E3wH62ncqBs"
+        "id": "E3wH62ncqBs",
+        "availability": "removed"
       },
       {
-        "id": "WOQ5DFWOOnA"
+        "id": "WOQ5DFWOOnA",
+        "availability": "removed"
       },
       {
-        "id": "PNEV0SQGsYA"
+        "id": "PNEV0SQGsYA",
+        "availability": "removed"
       },
       {
         "id": "LiT12psXDGc",
@@ -485,7 +492,8 @@
         "channel": "CHRISTOCENTRIC MESSAGE"
       },
       {
-        "id": "eOoNnVEBAKE"
+        "id": "eOoNnVEBAKE",
+        "availability": "private"
       },
       {
         "id": "24MVmVCBuuw",
@@ -549,6 +557,7 @@
       },
       {
         "id": "3AQrNGHD08w",
+        "availability": "members-only",
         "title": "APOSTLE JOSHUA SELMAN - THE MINDSET THAT WILL CHANGE YOUR LIFE FOREVER",
         "channel": "GROWTH MINDSET ACADEMY "
       },
@@ -563,7 +572,8 @@
         "channel": "OVERCOMING DAILY"
       },
       {
-        "id": "tNQwgbOhSR8"
+        "id": "tNQwgbOhSR8",
+        "availability": "removed"
       },
       {
         "id": "3Sq2yjWMMdM",
@@ -686,10 +696,12 @@
         "channel": "Christian House"
       },
       {
-        "id": "8WsL6HVQdeE"
+        "id": "8WsL6HVQdeE",
+        "availability": "private"
       },
       {
         "id": "tdjIPRKk-Z8",
+        "availability": "unavailable",
         "title": "CRY NO MORE , THE LORD HAS HEARD YOUR CRY- APOSTLE JOSHUA SELMAN",
         "channel": "PRIESTLY NATION"
       },
@@ -735,6 +747,7 @@
       },
       {
         "id": "ej8-m171zXs",
+        "availability": "unavailable",
         "title": "NO MORE TEARS FOR YOU AND YOUR FAMILY!! THIS IS HOW TO FORCE GOD TO HELP YOU. APOSTLE JOSHUA SELMAN",
         "channel": "PRIESTLY NATION"
       },
@@ -749,7 +762,8 @@
         "channel": "PRIESTLY NATION"
       },
       {
-        "id": "dd9VkJtCAu0"
+        "id": "dd9VkJtCAu0",
+        "availability": "private"
       },
       {
         "id": "dUDcILchGmQ",
@@ -1513,11 +1527,13 @@
       },
       {
         "id": "Q_-Xyt2-_cM",
+        "availability": "short-caption",
         "title": "HOW JESUS VISITED ME TWICE BY PASTOR JOHN ANOSIKE.",
         "channel": "GOSPEL RISE"
       },
       {
-        "id": "Ui_nvgCTpOI"
+        "id": "Ui_nvgCTpOI",
+        "availability": "private"
       },
       {
         "id": "SsJ84BCoJbo",
@@ -1561,6 +1577,7 @@
       },
       {
         "id": "zsGXBaRySGA",
+        "availability": "no-english-captions",
         "title": "WHEN THE SPIRIT TAKE OVER YOUR SOUL | PROPHETIC WORSHIP PST JOHN ANOSIKE",
         "channel": "Pastor John Anosike"
       },
@@ -1570,7 +1587,8 @@
         "channel": "Pastor John Anosike"
       },
       {
-        "id": "nNUZW36egpw"
+        "id": "nNUZW36egpw",
+        "availability": "removed"
       },
       {
         "id": "1-OL7WXS6DY",
@@ -1628,16 +1646,20 @@
     "playlistId": "PL-7eNLWzLZIDVCuyVtR8WI0Ad3-f1W6PQ",
     "videos": [
       {
-        "id": "43_wu5hDBiI"
+        "id": "43_wu5hDBiI",
+        "availability": "private"
       },
       {
-        "id": "8fcLxYLJdCI"
+        "id": "8fcLxYLJdCI",
+        "availability": "private"
       },
       {
-        "id": "DoA-a-g2o4g"
+        "id": "DoA-a-g2o4g",
+        "availability": "removed"
       },
       {
-        "id": "WK1eRHhS0D0"
+        "id": "WK1eRHhS0D0",
+        "availability": "private"
       },
       {
         "id": "OnCNeqieWi4",
@@ -1660,7 +1682,8 @@
         "channel": "Tony Evans"
       },
       {
-        "id": "GOAiCt5s_A0"
+        "id": "GOAiCt5s_A0",
+        "availability": "private"
       },
       {
         "id": "auMFDfbHjvY",
@@ -1668,7 +1691,8 @@
         "channel": "Praise on TBN"
       },
       {
-        "id": "cnJZ1tYmSL0"
+        "id": "cnJZ1tYmSL0",
+        "availability": "removed"
       },
       {
         "id": "2NJ2iZhMyrk",
@@ -1711,10 +1735,12 @@
         "channel": "INRI Motivation"
       },
       {
-        "id": "md5bPE9zV88"
+        "id": "md5bPE9zV88",
+        "availability": "private"
       },
       {
-        "id": "A2FE2iPD5Oc"
+        "id": "A2FE2iPD5Oc",
+        "availability": "private"
       },
       {
         "id": "PZCErpzLO1E",
