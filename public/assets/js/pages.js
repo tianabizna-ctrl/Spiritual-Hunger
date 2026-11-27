@@ -415,11 +415,16 @@ export async function libraryPage(params, query) {
 /* ============================================================
    Collection
    ============================================================ */
-export async function collectionPage(slug) {
+export async function collectionPage(slug, query = new URLSearchParams()) {
   const [index, collections] = await Promise.all([data.index(), data.collections()]);
   const c = collectionBySlug(slug, collections);
   if (!c) return notFoundPage("We could not find that collection.");
   const items = sortMessages(index.filter((m) => m.collections.includes(slug)), "title");
+  const dateSort = slug === "gospel-warrior" && ["oldest", "newest"].includes(query.get("sort")) ? query.get("sort") : "";
+  if (dateSort) items.sort((a, b) => {
+    if (!a.postedOn || !b.postedOn) return Number(Boolean(b.postedOn)) - Number(Boolean(a.postedOn));
+    return dateSort === "oldest" ? a.postedOn.localeCompare(b.postedOn) : b.postedOn.localeCompare(a.postedOn);
+  });
   if (c.playlistOrder) items.sort((a, b) => c.playlistOrder.indexOf(a.id) - c.playlistOrder.indexOf(b.id));
   const readers = new Map(items.map(m => [m.id, m]));
   const playlistOrder = c.playlistOrder || [];
@@ -428,6 +433,11 @@ export async function collectionPage(slug) {
   const topics = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
   const hours = Math.round(items.reduce((s, m) => s + m.minutes, 0) / 60);
   const others = collections.filter((x) => x.slug !== slug && x.count > 0).slice(0, 3);
+  const perPage = slug === "gospel-warrior" ? 48 : Math.max(1, items.length);
+  const pages = Math.max(1, Math.ceil(items.length / perPage));
+  const page = Math.max(1, Math.min(pages, Number.parseInt(query.get("page"), 10) || 1));
+  const baseLink = `#/collections/${encodeURIComponent(slug)}`;
+  const pageLink = n => `${baseLink}?page=${n}${dateSort ? `&amp;sort=${dateSort}` : ""}`;
 
   const content = `${pageHero({
     eyebrow: "Collection",
@@ -446,6 +456,7 @@ export async function collectionPage(slug) {
       <div>
         <h1>${esc(c.name)}</h1>
         <p>${fmt.number(items.length)} messages · ${fmt.number(hours)} hours of reading · ${esc(c.blurb)}</p>
+        ${slug === "gospel-warrior" ? `<p>Browse by <a href="${baseLink}">title</a> · <a href="${baseLink}?sort=oldest">oldest dated first</a> · <a href="${baseLink}?sort=newest">newest dated first</a></p>` : ""}
         ${c.playlistId ? `<p>${c.devotional ? `<a href="#/devotionals/${encodeURIComponent(c.devotional)}">Read the collection devotional</a> · ` : ""}<a href="https://www.youtube.com/playlist?list=${encodeURIComponent(c.playlistId)}">YouTube playlist</a> · Transcripts for ${readableEntries} of ${playlistOrder.length} entries</p>
           <details class="playlist-contents"${readableEntries ? "" : " open"}><summary>Playlist contents in source order</summary><ol>${playlistOrder.map(id => {
             const message = readers.get(id);
@@ -459,7 +470,12 @@ export async function collectionPage(slug) {
       </div>
       <a class="link-arrow" href="#/library?c=${encodeURIComponent(slug)}">Open in library ${icon("arrowRight")}</a>
     </div>
-    <div class="card-grid">${items.map(messageCard).join("")}</div>
+    <div class="card-grid">${items.slice((page - 1) * perPage, page * perPage).map(messageCard).join("")}</div>
+    ${pages > 1 ? `<nav class="load-more-wrap" aria-label="Collection pages">
+      ${page > 1 ? `<a class="btn btn-outline" href="${pageLink(page - 1)}">Previous</a>` : ""}
+      <span>Page ${page} of ${pages}</span>
+      ${page < pages ? `<a class="btn btn-outline" href="${pageLink(page + 1)}">Next</a>` : ""}
+    </nav>` : ""}
   </main>
   <section class="section">
     <div class="container">
@@ -492,7 +508,7 @@ export async function readerPage(id) {
   const source = doc.source || `https://www.youtube.com/watch?v=${id}`;
   const article = paragraphs.map((p, i) => {
     const selah = (i + 1) % 18 === 0 && i < paragraphs.length - 1 ? '<div class="selah" aria-hidden="true">· · ·</div>' : "";
-    return `<p>${esc(p)}</p>${selah}`;
+    return `<p>${doc.origin === "facebook" ? esc(p).replace(/\n/g, "<br>") : esc(p)}</p>${selah}`;
   }).join("");
 
   const content = `<main id="main" class="reader-page" data-reader-id="${esc(id)}">
@@ -506,6 +522,7 @@ export async function readerPage(id) {
             <h1 class="reader-title">${esc(doc.title)}</h1>
             <div class="reader-meta">
               <span>${esc(sourceLabel(doc))}</span><span class="dot"></span>
+              ${doc.postedOn ? `<time datetime="${esc(doc.postedOn)}">${esc(doc.postedOn)}</time><span class="dot"></span>` : ""}
               <span>${fmt.minutes(doc.minutes)}</span><span class="dot"></span>
               <span>${fmt.number(doc.words)} words</span><span class="dot"></span>
               <span>${doc.kind === "prayer" ? "Prayer & worship" : "Teaching"}</span>
@@ -1067,7 +1084,7 @@ export async function savedPage(params, query) {
     </section>
     <section data-saved-panel="continue" ${initialTab === "continue" ? "" : "hidden"}>
       ${continueItems.length ? `<div class="continue-grid">${continueItems.map((p) => `<a class="continue-card" href="#/read/${encodeURIComponent(p.doc.id)}">
-        ${image(p.doc.id, { alt: p.doc.title })}
+          ${mediaHtml(p.doc, { alt: p.doc.title })}
         <div style="min-width:0"><h4>${esc(p.doc.title)}</h4><div class="meta">${esc(collectionName(p.doc.collection))} · ${p.pct}% read</div><div class="progress-track"><span style="width:${p.pct}%"></span></div></div>
       </a>`).join("")}</div>` : emptyState({
         iconName: "bookOpen",

@@ -9,7 +9,7 @@ import { store } from "./store.js?v=20261127-3";
 import {
   homePage, libraryPage, readerPage, devotionalsPage, devotionalPage,
   prayerPage, collectionsPage, collectionPage, savedPage, aboutPage, notFoundPage,
-} from "./pages.js?v=20261127-3";
+} from "./pages.js?v=20261127-4";
 
 const app = document.getElementById("app");
 const searchRoot = document.getElementById("search-root");
@@ -55,7 +55,7 @@ async function loadPage(route) {
     case "devotional": return devotionalPage(route.slug);
     case "prayer": return prayerPage();
     case "collections": return collectionsPage();
-    case "collection": return collectionPage(route.slug);
+    case "collection": return collectionPage(route.slug, route.query);
     case "saved": return savedPage({}, route.query);
     case "about": return aboutPage();
     default: return notFoundPage();
@@ -516,7 +516,6 @@ function boot() {
   ensureSearch();
   render();
   const prefetch = () => {
-    data.searchIndex().catch(() => {});
     data.devotionals().catch(() => {});
     data.prayer().catch(() => {});
   };

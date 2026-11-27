@@ -14,6 +14,7 @@ import { readFile, writeFile, mkdir, readdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { readArchive } from "./gospel-warrior-data.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = path.join(ROOT, ".sources");
@@ -21,7 +22,7 @@ const OUT = path.join(ROOT, "public", "data");
 const TEXT_OUT = path.join(OUT, "texts");
 const CONTENT = path.join(ROOT, "content");
 const selmanPlaylists = JSON.parse(await readFile(path.join(CONTENT, "selman-playlists.json"), "utf8"));
-const gospelWarrior = JSON.parse(await readFile(path.join(CONTENT, "gospel-warrior.json"), "utf8"));
+const gospelWarrior = await readArchive(path.join(CONTENT, "gospel-warrior.json"));
 const fbPosts = new Map(gospelWarrior.posts.map((p) => [p.id, p]));
 
 const COLLECTIONS = [
@@ -38,7 +39,7 @@ const COLLECTIONS = [
   { slug: "general", name: "General Teachings", blurb: "A small gathering of essential messages outside the main themes.", accent: "ocean" },
   { slug: "available", name: "Available Teachings", blurb: "The wide catch-all archive — a cross-section of the entire ministry.", accent: "violet" },
   { slug: "short-messages", name: "Short Messages", blurb: "Brief, concentrated words for the day.", accent: "rose" },
-  { slug: "gospel-warrior", name: "Gospel Warrior", blurb: "Public Facebook studies from Gospel Warrior, cleaned of calls to action and promotions.", accent: "rose" },
+  { slug: "gospel-warrior", name: "Gospel Warrior", blurb: "Bible studies, prayers and reflections by John Domino Sanchez Asis, from archived Facebook posts and public photo captions.", accent: "rose" },
   ...selmanPlaylists.map(({ videos, ...collection }) => ({ ...collection, playlistOrder: videos.map(v => v.id) })),
 ];
 
@@ -334,7 +335,7 @@ async function main() {
     }
     if (paras.length === 0) { skipped.push({ id: rec.id, reason: "empty-after-clean" }); continue; }
 
-    const title = cleanTitle(raw.title || rec.title);
+    const title = fb ? fb.title : cleanTitle(raw.title || rec.title);
     const collection = rec.collections[0];
     const allText = paras.join(" ");
     const wc = words(allText);
@@ -457,7 +458,7 @@ async function main() {
     quote: {
       text: "The greatest tragedy in life is not death, but a life without purpose.",
       attribution: "Dr. Myles Munroe",
-      videoId: index.find((m) => /purpose/i.test(m.title))?.id || index[0]?.id,
+      videoId: index.find((m) => m.origin === "youtube" && /purpose/i.test(m.title))?.id || featured[0],
     },
     verses: JSON.parse(await readFile(path.join(CONTENT, "scriptures.json"), "utf8")).daily,
   };

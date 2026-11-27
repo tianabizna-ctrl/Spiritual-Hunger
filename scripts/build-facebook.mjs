@@ -8,13 +8,16 @@
  * Pass --refresh to fetch the public embed, or pass one or more saved captures.
  * Each capture covers a moving window. Never replace the archive with it.
  */
-import { readFile, writeFile, mkdir, open, rename, rm } from "node:fs/promises";
+import { readFile, writeFile, mkdir, open, rm } from "node:fs/promises";
 import { createHash } from "node:crypto";
+import { gunzipSync } from "node:zlib";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { postOrder, readArchive, writeArchive } from "./gospel-warrior-data.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RAW = path.join(ROOT, ".sources", "facebook", "raw.md");
+const LIBRARY = path.join(ROOT, ".sources", "facebook", "library", "library.json");
 const OUT = path.join(ROOT, "content", "gospel-warrior.json");
 const PAGE_URL = "https://www.facebook.com/iamGospelWarrior";
 const AUTHOR = "John Domino Sanchez Asis";
@@ -30,8 +33,8 @@ const CTA = [
   /share this (article|message|post)/i,
   /share this on your facebook/i,
   /facebook profile/i,
-  /follow (gospel warrior|this page|the page|our page|us)\b/i,
-  /invite your family/i,
+  /follow (gospel warrior|this page|the page|our page|us on)\b/i,
+  /invite your family.{0,80}(?:follow|page|group|subscribe)/i,
   /we want to continue creating/i,
   /even one share/i,
   /reach people who might otherwise never encounter/i,
@@ -39,13 +42,10 @@ const CTA = [
   /gospel warrior library/i,
   /thousands of free/i,
   /new additions (are being|being) added/i,
-  /discount/i,
-  /t-shirts|mugs|journals/i,
+  /discount (?:on|code)|\d+% discount/i,
   /as an expression of our gratitude/i,
   /beyond these benefits/i,
   /monthly subscription|regular giving|voluntary offering/i,
-  /if you (cannot contribute|cannot afford|are not something you can afford)/i,
-  /financial circumstances do not determine/i,
   /prayers, comments, invitations, and shares/i,
   /support (this ministry|the continuation|our work|the work)/i,
   /helps us continue/i,
@@ -79,49 +79,15 @@ const APPEALS = [
   /If this message has spoken to something you have been carrying, save it\.[\s\S]+?(?=Never underestimate what God can accomplish)/i,
 ];
 
-function splitSentences(text) {
-  const parts = text.match(/[^.!?]+[.!?]+["'”’)\]]*|[^.!?]+$/g) || [text];
-  return parts.map((s) => s.trim()).filter(Boolean);
-}
-
-function toParagraphs(sentences) {
-  const paras = [];
-  let buf = "";
-  for (const s of sentences) {
-    if (!buf) buf = s;
-    else if (buf.length + s.length < 520) buf += " " + s;
-    else { paras.push(buf); buf = s; }
-  }
-  if (buf) paras.push(buf);
-  return paras;
-}
-
-function titleCaseHook(sentence) {
-  const letters = sentence.replace(/[^A-Za-z]/g, "");
-  const upper = (sentence.match(/[A-Z]/g) || []).length;
-  if (letters.length > 12 && upper / letters.length > 0.7) {
-    const title = sentence.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase();
-    return title.replace(/\b(god|jesus|christ|christian|mary|elijah|leviticus)\b/gi, name => name[0].toUpperCase() + name.slice(1));
-  }
-  return sentence;
-}
-
-function cleanBody(body) {
-  for (const appeal of APPEALS) body = body.replace(appeal, "");
-  body = body.replace(/(?:But before you leave, )?remember what happened at the foot of Mount Sinai\./i, "Remember what happened at the foot of Mount Sinai.")
-    .replace(/(?:^|(?<=[.!?]) )remember (the priests standing before the altar|Reuben)\./g, " Remember $1.");
-  const sentences = splitSentences(body.replace(/https?:\/\/\S+/gi, "[link]"));
-  const kept = sentences.filter((s) => !s.includes("[link]") && !CTA.some((re) => re.test(s)));
-  return kept;
-}
+const sentences = new Intl.Segmenter("en", { granularity: "sentence" });
 
 function makePost(body, source, postedAgo, headline) {
-  const sourceHash = digest(body);
-  const kept = cleanBody(body);
-  if (!kept.length) return null;
-  const hook = titleCaseHook(headline && kept[0].startsWith(headline) ? headline : kept[0]).replace(/\blamb of God\b/g, "Lamb of God");
-  const title = hook.length > 110 ? hook.slice(0, 107).replace(/\s+\S*$/, "") + "…" : hook;
-  const paragraphs = toParagraphs(kept);
+  const sourceHash = digest(body.replace(/\s+/g, " ").trim());
+  const paragraphs = studyParagraphs(body);
+  if (!paragraphs.length) return null;
+  const firstLine = paragraphs[0].split("\n")[0];
+  const firstSentence = sentences.segment(firstLine)[Symbol.iterator]().next().value.segment.trim();
+  const title = (headline && cleanLine(headline)) || firstSentence;
   return {
     id: `fb-${sourceHash.slice(0, 32)}`, sourceHash, title, postedAgo, paragraphs,
     words: paragraphs.join(" ").split(/\s+/).length, source, origin: "facebook",
@@ -139,9 +105,9 @@ function parseCapture(raw) {
     const lines = md.trim().split(/\n+/).filter(line => line.trim() !== "...");
     // Facebook inserts a preview ellipsis before the expanded text, sometimes
     // even in the middle of a word. Unwrap the Reader's links for feed matching.
-    const body = lines.join(" ").replace(/^(.{0,500}?[a-z])\.\.\.(?=[a-z]| )/i, "$1")
-      .replace(/\[(https?:\/\/[^\]]+)\]\(https?:\/\/[^)]+\)/g, "$1").replace(/\s+/g, " ").trim();
-    const headline = /^[^a-z]+$/.test(lines[0]) ? lines[0] : undefined;
+    const body = lines.join("\n\n").replace(/^([\s\S]{0,520}?[a-z])\.\.\.(?=[a-z]| )/i, "$1")
+      .replace(/\[(https?:\/\/[^\]]+)\]\(https?:\/\/[^)]+\)/g, "$1").trim();
+    const headline = lines[0].length < 220 ? lines[0] : undefined;
     const post = makePost(body, `https://www.facebook.com/photo/?fbid=${photo[1]}`, undefined, headline);
     return post ? [post] : [];
   }
@@ -167,6 +133,105 @@ function parseCapture(raw) {
   return posts;
 }
 
+// Apply these to individual archive lines: an engagement prompt often has no
+// final punctuation, so sentence splitting alone can swallow the following verse.
+const ARCHIVE_CTA = [
+  /bundle4success\.sell\.app|facebook\.com\/(?:groups\/|profile\.php\?|iamGospelWarrior\/?(?:\s|$|\?))/i,
+  /\b(?:gospel warrior (?:library|community|subscribers?)|subscri\w*|e-?books?|hashtags? for|reader follow.up question|call to action)\b/i,
+  /\b(?:click (?:here|the link)|link (?:in|below)|stop scrolling|don[’']t scroll|scroll(?:ing)? (?:past|away))\b/i,
+  /\b(?:share|save|bookmark|repost) (?:this|it)\b|\blike (?:this (?:post|page)|and share)\b|\btag (?:them|a|your|someone|somebody|the|that)\b/i,
+  /\b(?:drop|leave|write|type) (?:an? |your )?(?:amen|reply|comment)\b|\b(?:comment|reply)\s*(?:below|here|with|[:“"])/i,
+  /\bfollow (?:along on|our page|this page|the page|me on|for more)\b|\bfollow (?:brother )?john[’']s page\b/i,
+  /\b(?:your friends list|in (?:your|the) feed|group invite|follow[- ]up question|support (?:this|our) (?:mission|ministry|work)|become a (?:partner|supporter))\b/i,
+  /\b(?:i|mag)-(?:share|save|tag|follow|comment)\b|\b(?:like and share|tap the link|share on)\b/i,
+  /from scandal to grace\s*[,—–-]*\s*because Jesus rewrites everything/i,
+];
+const AD = /\b(?:this (?:powerful |new |premium )?(?:e-?book|workbook)|my (?:new |latest )?(?:e-?book|book)|(?:exclusi\w* (?:to|for)|only (?:for|available to)) (?:my |our )?subscribers|(?:available|included) (?:only )?inside (?:the |our )?gospel warrior library|use (?:the |my )?promo code|pre[- ]?order|book launch)\b/i;
+const PERSONAL = /\bhappy (?:\d+(?:st|nd|rd|th) )?(?:birthday|(?:wedding )?anniversary)|\bto my (?:dear cousins|brother|wife|daughter|husband)|my brother Pachoy|we always thought that we would be the ones to teach you/i;
+const PROMO_FOOTER = [
+  /^(?:new book(?:\s|:)|(?:final )?book (?:promo|launch|announcement|title)|upcoming books|announcement\W+(?:a |new |upcoming )?book)/i,
+  /^coming soon\W+(?:on amazon|to amazon|this book|brother john)|^(?:available|preorder) (?:soon )?on amazon/i,
+  /^(?:about the author|brother john domino|o\.?a\.?s\.?i\.?s\.? foundation reminder|true christ followers group invite|hashtags for maximum)/i,
+  /^join the (?:kingdom preparation remnant|gospel warriors? community)/i,
+];
+
+function isPromotion(line) {
+  const text = line.normalize("NFKC");
+  return CTA.some(re => re.test(text)) || ARCHIVE_CTA.some(re => re.test(text)) || /@(?:followers|highlight)\b|https?:\/\/(?:www\.)?facebook\.com\/(?:groups\/|.*subscribenow)/i.test(text);
+}
+
+function cleanLine(line) {
+  const urls = [];
+  // A '?' inside a store link is not the end of a sentence. Keep URLs intact
+  // while finding sentence boundaries, including links to Bible references.
+  const masked = line.replace(/https?:\/\/\S+/g, url => {
+    urls.push(url);
+    return `\uE000${urls.length - 1}\uE001`;
+  });
+  const restore = text => text.replace(/\uE000(\d+)\uE001/g, (_, i) => urls[i]);
+  if (!isPromotion(line)) return line;
+  const kept = Array.from(sentences.segment(masked), ({ segment }) => {
+    const original = restore(segment);
+    return isPromotion(original) ? "" : original;
+  }).join("").trim();
+  return /[\p{L}\p{N}]/u.test(kept) ? kept : "";
+}
+
+function studyParagraphs(body) {
+  for (const appeal of APPEALS) body = body.replace(appeal, "");
+  const paragraphs = [];
+  let prompt = false;
+  let end = false;
+  for (const block of body.split(/\r?\n\s*\n/)) {
+    const kept = [];
+    for (const raw of block.split(/\r?\n/)) {
+      const line = raw.trim();
+      const label = line.replace(/^[^\p{L}]+/u, "");
+      if (PROMO_FOOTER.some(re => re.test(label))) { end = true; break; }
+      if (prompt && /^[“"‘']/.test(line)) { prompt = false; continue; }
+      prompt = /(?:comment|type|write|reply)[^.!?]{0,35}:\s*$/i.test(line);
+      const keptLine = cleanLine(line);
+      if (keptLine) kept.push(keptLine);
+    }
+    if (kept.length) paragraphs.push(kept.join("\n"));
+    if (end) break;
+  }
+  return paragraphs;
+}
+
+async function readLibrary(file) {
+  const raw = await readFile(file, "utf8");
+  if (!/\.html?$/i.test(file)) return JSON.parse(raw);
+  const payload = raw.match(/window\.GW_GZ_B64\s*=\s*"([A-Za-z0-9+/=]+)"/);
+  if (!payload) throw new Error("No Gospel Warrior library dataset in the supplied HTML");
+  return JSON.parse(gunzipSync(Buffer.from(payload[1], "base64")));
+}
+
+function libraryPosts(library) {
+  const today = new Date().toISOString().slice(0, 10);
+  const studies = new Map();
+  for (const info of library.index) {
+    const entry = library.contents[info.id];
+    if (!entry) throw new Error(`Library index has no text record for ${info.id}`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(info.date) || info.date < "2009-07-01" || info.date > today) continue;
+    if (!/^\d+$/.test(entry.postId)) continue;
+    const photo = entry.profileUrl === PAGE_URL && entry.sourceUrl === `https://www.facebook.com/photo/?fbid=${entry.postId}`;
+    if (!photo && !/^https:\/\/www\.facebook\.com\/iamGospelWarrior\/posts\/[\w-]+\/?$/.test(entry.sourceUrl)) continue;
+    const body = entry.content || "";
+    if (PERSONAL.test(entry.title) || /happy birthday, (?!Jesus\b)/i.test(body) || AD.test(body) || /e-?book|subscrib|giveaway|raffle/i.test(entry.title)) continue;
+    if (/\bUnlishop\b/i.test(body) || /happy mothers day/i.test(entry.title)) continue;
+    const post = makePost(body, entry.sourceUrl, undefined, entry.title);
+    if (!post || !/\b(?:Jesus|Christ|Scripture|Bible|God|faith|prayer|Lord|Gospel|Diyos|Biblia|Cristo|Panginoon)\b/i.test(post.paragraphs.join(" "))) continue;
+    post.id = `fb-${entry.postId}`;
+    post.postedOn = info.date;
+    // The snapshot identifies duplicate editions by the canonical post ID.
+    // Use a readable alternate only if the canonical record is unavailable.
+    const group = entry.duplicateGroup || entry.id;
+    if (!studies.has(group) || group === entry.id) studies.set(group, post);
+  }
+  return [...studies.values()];
+}
+
 async function readPublicPage(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(90_000) });
   if (!response.ok) throw new Error(`Public page returned HTTP ${response.status}: ${url}`);
@@ -185,10 +250,25 @@ async function capture(url) {
 async function main() {
   const args = process.argv.slice(2);
   const refresh = args.includes("--refresh");
+  const index = args.indexOf("--library");
+  let library;
+  if (index !== -1) {
+    args.splice(index, 1);
+    library = args[index] && !args[index].startsWith("--") ? args.splice(index, 1)[0] : LIBRARY;
+  }
   const files = args.filter(arg => arg !== "--refresh");
-  if (!refresh && !files.length) files.push(RAW);
+  if (!refresh && !library && !files.length) files.push(RAW);
   const incoming = [];
+  const excluded = new Set();
   for (const file of files) incoming.push(...parseCapture(await readFile(file, "utf8")));
+  if (library) {
+    const snapshot = await readLibrary(library);
+    const posts = libraryPosts(snapshot);
+    for (const entry of Object.values(snapshot.contents)) excluded.add(`fb-${entry.postId}`);
+    for (const p of posts) excluded.delete(p.id);
+    console.log(`Library: ${posts.length} eligible entries before deduplication.`);
+    incoming.push(...posts);
+  }
   if (refresh) {
     // One unavailable photo or timeline must not discard the other captures.
     const collect = async (url) => {
@@ -210,32 +290,39 @@ async function main() {
 
   const lockPath = `${OUT}.lock`;
   const lock = await open(lockPath, "wx");
-  const temp = `${OUT}.${process.pid}.tmp`;
   try {
-    const archive = JSON.parse(await readFile(OUT, "utf8"));
-    const posts = new Map(archive.posts.map(p => [p.id, p]));
-    const byHash = new Map(archive.posts.map(p => [p.sourceHash, p.id]));
-    const bySource = new Map(archive.posts.filter(p => p.source !== PAGE_URL).map(p => [p.source, p.id]));
+    const archive = await readArchive(OUT);
+    const retained = archive.posts.filter(p => !excluded.has(p.id));
+    const posts = new Map(retained.map(p => [p.id, p]));
+    const byHash = new Map(retained.map(p => [p.sourceHash, p.id]));
+    const bySource = new Map(retained.filter(p => p.source !== PAGE_URL).map(p => [p.source, p.id]));
+    const textKey = p => digest(p.paragraphs.join(" ").normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim());
+    const byText = new Map(retained.map(p => [textKey(p), p.id]));
     if (byHash.has(undefined) || byHash.size !== posts.size) throw new Error("Invalid source hashes in archive");
     for (const p of incoming) {
-      const id = bySource.get(p.source) ?? byHash.get(p.sourceHash) ?? p.id;
-      const old = posts.get(id);
+      const key = textKey(p);
+      const id = bySource.get(p.source) ?? byHash.get(p.sourceHash) ?? (posts.has(p.id) ? p.id : null);
+      if (!id && byText.has(key)) continue;
+      const readerId = id ?? p.id;
+      const old = posts.get(readerId);
+      // The timeline can flatten a photo caption into one line. Keep the
+      // verified, dated per-post edition when that same preview reappears.
+      if (old?.postedOn && old.source !== PAGE_URL && !p.postedOn && p.sourceHash === old.sourceHash) continue;
       const source = p.source === PAGE_URL && old ? old.source : p.source;
-      posts.set(id, { ...old, ...p, id, source, postedAgo: old?.postedAgo ?? p.postedAgo });
-      if (source !== PAGE_URL) bySource.set(source, id);
-      byHash.set(p.sourceHash, id);
+      posts.set(readerId, { ...old, ...p, id: readerId, source, postedAgo: old?.postedAgo ?? p.postedAgo, postedOn: p.postedOn ?? old?.postedOn });
+      if (source !== PAGE_URL) bySource.set(source, readerId);
+      byHash.set(p.sourceHash, readerId);
+      byText.set(key, readerId);
     }
-    const added = posts.size - archive.posts.length;
-    const merged = [...posts.values()].sort((a, b) => b.words - a.words || a.id.localeCompare(b.id));
-    if (JSON.stringify(merged) !== JSON.stringify(archive.posts)) {
+    const added = posts.size - retained.length;
+    const merged = [...posts.values()].sort(postOrder);
+    if ((library && !archive.parts) || merged.length !== archive.posts.length || merged.some((post, i) => post !== archive.posts[i] && JSON.stringify(post) !== JSON.stringify(archive.posts[i]))) {
       archive.posts = merged;
       archive.fetchedAt = new Date().toISOString().slice(0, 10);
-      await writeFile(temp, JSON.stringify(archive, null, 2) + "\n");
-      await rename(temp, OUT);
+      await writeArchive(OUT, archive);
     }
     console.log(`Read ${incoming.length} posts from captures; added ${added}; archive now contains ${posts.size}.`);
   } finally {
-    await rm(temp, { force: true });
     await lock.close();
     await rm(lockPath);
   }

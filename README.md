@@ -22,6 +22,10 @@ The [Gospel Warrior collection](https://tianabizna-ctrl.github.io/Spiritual-Hung
 
 To refresh, run `node scripts/build-facebook.mjs --refresh`, then `node scripts/build-data.mjs`. The first command saves captures under `.sources/facebook/snapshots/` and merges complete posts into `content/gospel-warrior.json`; old entries keep their reader and bookmark IDs. Repeated imports match by post link when available or by the full source text. You can also pass paths to saved timeline or photo-embed Markdown captures. Review new titles and text for promotions before publishing. Refreshes are manual and can miss posts between captures.
 
+For a local **Gospel Warrior Bible Study Library** snapshot, pass `--library "/path/to/gospel-warrior-library.html"` instead of `--refresh`, or use both options. The importer reads the embedded data without executing the HTML. It also accepts the decoded library JSON. It looks for studies dated July 2009 onward linked to the author's posts, filters personal announcements and product pitches, and retains source wording, paragraph breaks, links and dates. Dated archive entries live in monthly parts under `content/gospel-warrior/`, listed in `content/gospel-warrior.json`.
+
+The October 7, 2026 snapshot supplies most of the studies. Public photo captions include two short readings from 2017; the earliest verified prayer is dated September 24, 2017. The browser offers oldest- and newest-dated ordering. The album previews and web archives checked did not yield studies back to the profile's July 2009 start, and later feed captures do not fill every intervening day.
+
 ## YouTube playlist skill for Arena AI
 
 [Download the fetching skill and Python scripts](https://tianabizna-ctrl.github.io/Spiritual-Hunger/downloads/youtube-transcript-library.zip), or use the local copy at `public/downloads/youtube-transcript-library.zip`. Extract it and open `ARENA.md` for the paste-ready prompt. The toolkit checks YouTube access, lists playlist entries, downloads captions and verifies transcript files. If your Arena workspace cannot reach YouTube, upload the fetched JSON instead. No video downloads are needed.
