@@ -245,7 +245,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29875895941994761",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29875895941994761",
+      "postedAt": "2026-11-27T10:47:39.000Z"
     },
     {
       "id": "fb-6bef7e6d7155647bde26cbaadb257196",
@@ -454,7 +456,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29873496565568032",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29873496565568032",
+      "postedAt": "2026-11-27T05:38:23.000Z"
     },
     {
       "id": "fb-fdc8480b2ca78594776e8d3651554bb8",
@@ -674,7 +678,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29873943702189985",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29873943702189985",
+      "postedAt": "2026-11-27T06:38:28.000Z"
     },
     {
       "id": "fb-25b8c2ecb70653218a62cf07abbbad08",
@@ -889,7 +895,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29873746118876410",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29873746118876410",
+      "postedAt": "2026-11-27T06:11:00.000Z"
     },
     {
       "id": "fb-ac85cea8731f98523ecc2377ff11fcfe",
@@ -1091,7 +1099,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29874050705512618",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29874050705512618",
+      "postedAt": "2026-11-27T06:53:07.000Z"
     },
     {
       "id": "fb-8f32da8b40efc85ff2aafdbe00e32af1",
@@ -1280,7 +1290,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29874097342174621",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29874097342174621",
+      "postedAt": "2026-11-27T06:59:55.000Z"
     },
     {
       "id": "fb-5da6dc026483dd2d75a6c6e0789d1140",
@@ -1496,7 +1508,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29873599095557779",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29873599095557779",
+      "postedAt": "2026-11-27T05:51:42.000Z"
     },
     {
       "id": "fb-ccyi0p",
@@ -1709,7 +1723,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29874639152120440",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29874639152120440",
+      "postedAt": "2026-11-27T08:11:37.000Z"
     },
     {
       "id": "fb-9a85b4e8387e17b2529df3589ba4e43d",
@@ -1893,7 +1909,9 @@
       "source": "https://www.facebook.com/photo/?fbid=29878101685107520",
       "origin": "facebook",
       "author": "Gospel Warrior (John Domino Sanchez Asis)",
-      "postedOn": "2026-11-27"
+      "postedOn": "2026-11-27",
+      "photoId": "29878101685107520",
+      "postedAt": "2026-11-27T14:38:48.000Z"
     },
     {
       "id": "fb-6l9hae",
@@ -1950,42 +1968,45 @@
     }
   ],
   "parts": [
-    "gospel-warrior/2017-09-b8ad6a954099088c.json",
-    "gospel-warrior/2017-12-e07b8979c5b47bc5.json",
-    "gospel-warrior/2023-02-107fa27d3dfb5480.json",
-    "gospel-warrior/2023-03-b1a73a4a09be4acc.json",
-    "gospel-warrior/2023-04-b8f9d617fe274a6f.json",
-    "gospel-warrior/2023-05-f5d5464dac36115e.json",
-    "gospel-warrior/2023-06-0b991b8f12fe8604.json",
-    "gospel-warrior/2023-07-a87db60d551c42ef.json",
-    "gospel-warrior/2023-08-cf2e56147e7e3be6.json",
-    "gospel-warrior/2023-09-f0dc912e9ce25ff7.json",
-    "gospel-warrior/2023-10-d73bc9f63da2761c.json",
-    "gospel-warrior/2023-11-12e276195aec8bdf.json",
-    "gospel-warrior/2024-01-14e9141ba9f8169b.json",
-    "gospel-warrior/2024-04-14d0fb4ba97196a0.json",
-    "gospel-warrior/2024-05-575e25fbd1b1bcaf.json",
-    "gospel-warrior/2024-06-916c00b1f90eaa2f.json",
-    "gospel-warrior/2024-07-b3a17700a3a3f5bd.json",
-    "gospel-warrior/2024-12-0c04f88e7291202b.json",
-    "gospel-warrior/2025-01-6a9788eca4fb0ec4.json",
-    "gospel-warrior/2025-02-dfae44b939e2932a.json",
-    "gospel-warrior/2025-03-db57f2e388b30077.json",
-    "gospel-warrior/2025-04-a33cd25ec642021b.json",
-    "gospel-warrior/2025-05-89a2bd8606e49a9e.json",
-    "gospel-warrior/2025-06-ea3af126150a8f86.json",
-    "gospel-warrior/2025-10-093dbe761e43151a.json",
-    "gospel-warrior/2025-11-c9244eeedd6b135c.json",
-    "gospel-warrior/2025-12-3a1eb59c3b35d4e2.json",
-    "gospel-warrior/2026-01-8cc170604dff4411.json",
-    "gospel-warrior/2026-02-5059333213b9d9b8.json",
-    "gospel-warrior/2026-03-c0f428b383113d9a.json",
-    "gospel-warrior/2026-04-1698c7ec2d6a5409.json",
-    "gospel-warrior/2026-05-6f843f540d0f576b.json",
-    "gospel-warrior/2026-06-6914be7d0185029b.json",
-    "gospel-warrior/2026-07-6fdbf5268dbd9fb6.json",
-    "gospel-warrior/2026-08-055e1eb082797bb3.json",
-    "gospel-warrior/2026-09-9ab140a14f926546.json",
-    "gospel-warrior/2026-10-ff55d352b1af91a1.json"
+    "gospel-warrior/2017-09-57a532a237fdefd6.json",
+    "gospel-warrior/2017-12-e555fcccaa20e5ec.json",
+    "gospel-warrior/2023-02-30bb025f2301bc0a.json",
+    "gospel-warrior/2023-03-13601a2855fc92e8.json",
+    "gospel-warrior/2023-04-fe61f7476790bf1c.json",
+    "gospel-warrior/2023-05-4b02e09e71babf8f.json",
+    "gospel-warrior/2023-06-5296b3f75af03468.json",
+    "gospel-warrior/2023-07-cf5a8f80f532d2a0.json",
+    "gospel-warrior/2023-08-e5084be2c32dfd77.json",
+    "gospel-warrior/2023-09-02ad8862b4c18b0e.json",
+    "gospel-warrior/2023-10-48d8aaf18664ba8f.json",
+    "gospel-warrior/2023-11-f7c70e98b0405edf.json",
+    "gospel-warrior/2023-12-00429aa04d4405da.json",
+    "gospel-warrior/2024-01-65152118af70415f.json",
+    "gospel-warrior/2024-04-2027e02abef319a2.json",
+    "gospel-warrior/2024-05-03a5b3be10be5e49.json",
+    "gospel-warrior/2024-06-47f19c4ef66cfbe4.json",
+    "gospel-warrior/2024-07-acbbb8a2cbd0bd8c.json",
+    "gospel-warrior/2024-08-92b8f66fdaa87d12.json",
+    "gospel-warrior/2024-12-5c09c160f846c3d9.json",
+    "gospel-warrior/2025-01-6d5a747b31d7efae.json",
+    "gospel-warrior/2025-02-f5cbcfa722c13606.json",
+    "gospel-warrior/2025-03-8e95d48601328444.json",
+    "gospel-warrior/2025-04-38ca00037d8af93b.json",
+    "gospel-warrior/2025-05-2e11da35deee5785.json",
+    "gospel-warrior/2025-06-fd52def26d17f75a.json",
+    "gospel-warrior/2025-10-6fb7e62b91b22c91.json",
+    "gospel-warrior/2025-11-660f7b23105c0eda.json",
+    "gospel-warrior/2025-12-b2e5cc636f5682b6.json",
+    "gospel-warrior/2026-01-8b73de800acc9339.json",
+    "gospel-warrior/2026-02-eea5fd703f4099d8.json",
+    "gospel-warrior/2026-03-939c216c6956a984.json",
+    "gospel-warrior/2026-04-ecba0c24248ebf2e.json",
+    "gospel-warrior/2026-05-c7e2c2e9d5866448.json",
+    "gospel-warrior/2026-06-ebd0f599d7243bdf.json",
+    "gospel-warrior/2026-07-6b565fa1f1199c84.json",
+    "gospel-warrior/2026-08-c0819c5142141502.json",
+    "gospel-warrior/2026-09-34b293b35500621a.json",
+    "gospel-warrior/2026-10-5c954aee46c75e75.json",
+    "gospel-warrior/2026-11-be14a66ef7ef969e.json"
   ]
 }

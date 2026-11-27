@@ -1,10 +1,11 @@
 {
-  "messages": 9551,
+  "gospelWarriorRevision": "1d8d87f7368bd86996e2873f1026d0b76df53f294c80aa76662fa06a8b176983",
+  "messages": 11550,
   "collections": 29,
-  "words": 18074912,
+  "words": 25495021,
   "hours": 826.1,
-  "prayerMessages": 595,
-  "scriptures": 1194,
-  "avgMinutes": 9,
+  "prayerMessages": 639,
+  "scriptures": 1247,
+  "avgMinutes": 11,
   "updated": "2026-11-27"
 }
