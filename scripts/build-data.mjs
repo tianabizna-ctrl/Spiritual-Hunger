@@ -12,6 +12,7 @@
  */
 import { readFile, writeFile, mkdir, readdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { readArchive } from "./gospel-warrior-data.mjs";
@@ -282,13 +283,15 @@ const sha = (s) => {
 };
 
 async function main() {
-  const manifest = JSON.parse(await readFile(path.join(SRC, "manifest.json"), "utf8"));
+  const facebookOnly = process.argv.includes("--facebook-only");
+  const previous = facebookOnly ? JSON.parse(await readFile(path.join(OUT, "index.json"), "utf8")) : [];
+  const manifest = facebookOnly ? [] : JSON.parse(await readFile(path.join(SRC, "manifest.json"), "utf8"));
   const byId = new Map(manifest.map(r => [r.id, r]));
   for (const post of gospelWarrior.posts) {
     byId.set(post.id, { id: post.id, title: post.title, collections: ["gospel-warrior"] });
   }
   const practices = new Map();
-  for (const playlist of selmanPlaylists) {
+  for (const playlist of facebookOnly ? [] : selmanPlaylists) {
     for (const video of playlist.videos) {
       if (!video.title && !byId.has(video.id)) continue;
       const rec = byId.get(video.id) || { id: video.id, title: video.title, collections: [] };
@@ -299,12 +302,11 @@ async function main() {
     }
   }
   await mkdir(TEXT_OUT, { recursive: true });
-  await rm(TEXT_OUT, { recursive: true, force: true });
+  if (!facebookOnly) await rm(TEXT_OUT, { recursive: true, force: true });
   await mkdir(TEXT_OUT, { recursive: true });
 
-  const index = [];
+  const index = previous.filter(doc => doc.origin !== "facebook");
   const skipped = [];
-  const searchDocs = [];
   const termMap = new Map();
   const quoteSources = new Map();
 
@@ -365,6 +367,8 @@ async function main() {
       origin: fb ? "facebook" : "youtube",
       postedAgo: fb ? fb.postedAgo : undefined,
       postedOn: fb?.postedOn,
+      postedAt: fb?.postedAt,
+      firstSeenOn: fb?.firstSeenOn,
       accent: COLLECTIONS.find((c) => c.slug === collection)?.accent || "gold",
     };
     index.push(doc);
@@ -385,26 +389,22 @@ async function main() {
       source: doc.source,
     }));
 
-    // search document: title + topics weighted heavily
-    const counts = new Map();
-    const add = (tokens, weight) => {
-      for (const t of tokens) counts.set(t, (counts.get(t) || 0) + weight);
-    };
-    add(tokensFor(title), 8);
-    add(tokensFor(topics.join(" ")), 5);
-    add(tokensFor(allText), 1);
-    const ranked = [...counts.entries()];
-    const titleTerms = new Set(tokensFor(title));
-    for (const [term] of counts) if (titleTerms.has(term) && !ranked.find(([t]) => t === term)) ranked.push([term, 1]);
-    const docIdx = searchDocs.length;
-    searchDocs.push({ i: docIdx, id: doc.id });
-    for (const [term] of ranked) {
-      if (!termMap.has(term)) termMap.set(term, []);
-      termMap.get(term).push(docIdx);
-    }
   }
 
   index.sort((a, b) => a.title.localeCompare(b.title));
+  // Posting lists refer to rows of the final index. Reuse published reader
+  // files for non-Facebook messages on runners without the raw transcripts.
+  for (const [i, doc] of index.entries()) {
+    const text = quoteSources.get(doc.id) || JSON.parse(await readFile(path.join(TEXT_OUT, `${doc.id}.json`), "utf8"));
+    const tokens = tokensFor([doc.title, ...doc.topics, ...text.paragraphs].join(" "));
+    for (const term of new Set(tokens)) {
+      if (!termMap.has(term)) termMap.set(term, []);
+      termMap.get(term).push(i);
+    }
+  }
+  for (const doc of previous) {
+    if (doc.origin === "facebook" && !fbPosts.has(doc.id) && /^fb-[\w-]+$/.test(doc.id)) await rm(path.join(TEXT_OUT, `${doc.id}.json`), { force: true });
+  }
 
   const collections = COLLECTIONS.map((c) => {
     const items = index.filter((m) => m.collections.includes(c.slug));
@@ -423,6 +423,7 @@ async function main() {
   const totalHours = totalSeconds > 60 ? totalSeconds / 3600 : totalWords / 150 / 60;
 
   const stats = {
+    gospelWarriorRevision: createHash("sha256").update(await readFile(path.join(CONTENT, "gospel-warrior.json"))).digest("hex"),
     messages: index.length,
     collections: collections.filter((c) => c.count > 0 || c.playlistId).length,
     words: totalWords,
@@ -434,12 +435,7 @@ async function main() {
   };
 
   // search index, docs are in alphabetical index order
-  const order = new Map(index.map((m, i) => [m.id, i]));
-  const terms = {};
-  for (const term of [...termMap.keys()].sort()) {
-    const ids = [...new Set(termMap.get(term).map((i) => order.get(searchDocs[i].id)))].sort((a, b) => a - b);
-    if (ids.length) terms[term] = ids;
-  }
+  const terms = Object.fromEntries([...termMap.keys()].sort().map(term => [term, termMap.get(term)]));
 
   // featured: spread across collections, readable titles
   const featureSlugs = ["purpose", "prayer-fasting", "leadership", "kingdom", "marriage", "crisis", "men-fatherhood", "success"];
@@ -467,6 +463,10 @@ async function main() {
   await writeFile(path.join(OUT, "collections.json"), JSON.stringify(collections, null, 2));
   await writeFile(path.join(OUT, "stats.json"), JSON.stringify(stats, null, 2));
   await writeFile(path.join(OUT, "search.json"), JSON.stringify({ docs: index.map((m) => m.id), terms }));
+  if (facebookOnly) {
+    console.log(`Published data ready: ${fbPosts.size} Gospel Warrior readings in an index of ${index.length}.`);
+    return;
+  }
   await writeFile(path.join(OUT, "home.json"), JSON.stringify(home, null, 2));
 
   // devotionals + prayer themes (merged with scripture text)

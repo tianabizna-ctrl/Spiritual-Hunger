@@ -1,0 +1,57 @@
+name: Refresh Gospel Warrior
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: gospel-warrior-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      publish: ${{ steps.release.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Import public posts
+        run: node scripts/build-facebook.mjs --refresh
+      - name: Build and commit new readings
+        run: |
+          if git diff --quiet -- content/gospel-warrior.json; then exit 0; fi
+          node scripts/build-data.mjs --facebook-only
+          git add -- content/gospel-warrior.json content/gospel-warrior/ public/data/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Refresh public Gospel Warrior readings'
+          git push origin HEAD:main
+      - name: Check whether Pages has this revision
+        id: release
+        run: |
+          node --input-type=module <<'JS'
+          import { readFile, appendFile } from 'node:fs/promises';
+          const expected = JSON.parse(await readFile('public/data/stats.json', 'utf8')).gospelWarriorRevision;
+          if (!expected) throw new Error('Missing Gospel Warrior data revision');
+          const url = `https://tianabizna-ctrl.github.io/Spiritual-Hunger/data/stats.json?run=${process.env.GITHUB_RUN_ID}`;
+          const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+          if (!response.ok && response.status !== 404) throw new Error(`Pages returned ${response.status}`);
+          const live = response.ok ? (await response.json()).gospelWarriorRevision : null;
+          await appendFile(process.env.GITHUB_OUTPUT, `publish=${expected !== live}\n`);
+          JS
+  publish:
+    needs: refresh
+    if: needs.refresh.outputs.publish == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml

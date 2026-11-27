@@ -10,7 +10,7 @@ async function getJSON(path) {
         return res.json();
       })
       .catch((err) => {
-        cache.delete(path);
+        if (cache.get(path) === promise) cache.delete(path);
         throw err;
       });
     cache.set(path, promise);
@@ -19,6 +19,17 @@ async function getJSON(path) {
 }
 
 export const data = {
+  async checkForUpdates() {
+    const previous = await this.stats();
+    const res = await fetch(new URL("data/stats.json", document.baseURI), { cache: "no-store" });
+    if (!res.ok) throw new Error(`Could not check the library (${res.status})`);
+    const latest = await res.json();
+    if (!latest.gospelWarriorRevision || latest.gospelWarriorRevision === previous.gospelWarriorRevision) return false;
+    cache.clear();
+    snippetCache.clear();
+    cache.set("stats.json", Promise.resolve(latest));
+    return true;
+  },
   async index() { return getJSON("index.json"); },
   async collections() { return getJSON("collections.json"); },
   async stats() { return getJSON("stats.json"); },

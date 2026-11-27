@@ -1,15 +1,15 @@
 /* Application shell: routing, search, persistence wiring, quiet interactions. */
 
-import { header, footer, collectionName } from "./components.js?v=20261127-3";
+import { header, footer, collectionName } from "./components.js?v=20261127-5";
 import { icon } from "./icons.js?v=20261127-3";
 import {
   data, esc, tokenize, highlight, searchMessages, snippetFor,
-} from "./data.js?v=20261127-3";
+} from "./data.js?v=20261127-5";
 import { store } from "./store.js?v=20261127-3";
 import {
   homePage, libraryPage, readerPage, devotionalsPage, devotionalPage,
   prayerPage, collectionsPage, collectionPage, savedPage, aboutPage, notFoundPage,
-} from "./pages.js?v=20261127-4";
+} from "./pages.js?v=20261127-5";
 
 const app = document.getElementById("app");
 const searchRoot = document.getElementById("search-root");
@@ -515,6 +515,21 @@ window.addEventListener("hashchange", () => {
 function boot() {
   ensureSearch();
   render();
+  const interval = 15 * 60_000;
+  let lastCheck = Date.now();
+  data.stats().catch(() => {});
+  const checkLibrary = async () => {
+    if (document.hidden || Date.now() - lastCheck < interval) return;
+    lastCheck = Date.now();
+    try {
+      if (!await data.checkForUpdates()) return;
+      const route = parseRoute();
+      if (route.slug === "gospel-warrior" && !searchState.open && window.scrollY < 100) await render();
+      showToast("The Gospel Warrior collection has been updated.");
+    } catch { /* Keep the current reading available and retry on the next check. */ }
+  };
+  setInterval(checkLibrary, interval);
+  document.addEventListener("visibilitychange", checkLibrary);
   const prefetch = () => {
     data.devotionals().catch(() => {});
     data.prayer().catch(() => {});

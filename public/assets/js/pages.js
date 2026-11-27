@@ -4,11 +4,11 @@ import { icon, TOPIC_ICONS } from "./icons.js?v=20261127-3";
 import {
   header, footer, pageHero, sectionHead, messageCard, devotionalCard,
   collectionCard, emptyState, quoteBand, collectionName, sourceLabel, topicIcon, mediaHtml,
-} from "./components.js?v=20261127-3";
+} from "./components.js?v=20261127-5";
 import {
   data, fmt, esc, image, dailyIndex, relatedMessages, topicCounts,
   collectionBySlug, searchMessages, snippetFor,
-} from "./data.js?v=20261127-3";
+} from "./data.js?v=20261127-5";
 import { store } from "./store.js?v=20261127-3";
 
 const collectionOptions = (collections) => collections.filter((c) => c.count > 0);
@@ -420,10 +420,13 @@ export async function collectionPage(slug, query = new URLSearchParams()) {
   const c = collectionBySlug(slug, collections);
   if (!c) return notFoundPage("We could not find that collection.");
   const items = sortMessages(index.filter((m) => m.collections.includes(slug)), "title");
-  const dateSort = slug === "gospel-warrior" && ["oldest", "newest"].includes(query.get("sort")) ? query.get("sort") : "";
+  const requestedSort = query.get("sort") || "newest";
+  const dateSort = slug === "gospel-warrior" && ["oldest", "newest"].includes(requestedSort) ? requestedSort : "";
   if (dateSort) items.sort((a, b) => {
-    if (!a.postedOn || !b.postedOn) return Number(Boolean(b.postedOn)) - Number(Boolean(a.postedOn));
-    return dateSort === "oldest" ? a.postedOn.localeCompare(b.postedOn) : b.postedOn.localeCompare(a.postedOn);
+    const aDate = a.postedAt || a.postedOn || a.firstSeenOn;
+    const bDate = b.postedAt || b.postedOn || b.firstSeenOn;
+    if (!aDate || !bDate) return Number(Boolean(bDate)) - Number(Boolean(aDate));
+    return dateSort === "oldest" ? aDate.localeCompare(bDate) : bDate.localeCompare(aDate);
   });
   if (c.playlistOrder) items.sort((a, b) => c.playlistOrder.indexOf(a.id) - c.playlistOrder.indexOf(b.id));
   const readers = new Map(items.map(m => [m.id, m]));
@@ -437,7 +440,7 @@ export async function collectionPage(slug, query = new URLSearchParams()) {
   const pages = Math.max(1, Math.ceil(items.length / perPage));
   const page = Math.max(1, Math.min(pages, Number.parseInt(query.get("page"), 10) || 1));
   const baseLink = `#/collections/${encodeURIComponent(slug)}`;
-  const pageLink = n => `${baseLink}?page=${n}${dateSort ? `&amp;sort=${dateSort}` : ""}`;
+  const pageLink = n => `${baseLink}?page=${n}${slug === "gospel-warrior" ? `&amp;sort=${dateSort || "title"}` : ""}`;
 
   const content = `${pageHero({
     eyebrow: "Collection",
@@ -456,7 +459,7 @@ export async function collectionPage(slug, query = new URLSearchParams()) {
       <div>
         <h1>${esc(c.name)}</h1>
         <p>${fmt.number(items.length)} messages · ${fmt.number(hours)} hours of reading · ${esc(c.blurb)}</p>
-        ${slug === "gospel-warrior" ? `<p>Browse by <a href="${baseLink}">title</a> · <a href="${baseLink}?sort=oldest">oldest dated first</a> · <a href="${baseLink}?sort=newest">newest dated first</a></p>` : ""}
+        ${slug === "gospel-warrior" ? `<p>Browse by <a href="${baseLink}?sort=title">title</a> · <a href="${baseLink}?sort=oldest">oldest first</a> · <a href="${baseLink}?sort=newest">newest first</a></p><p>Checks for new public studies every 15 minutes.</p>` : ""}
         ${c.playlistId ? `<p>${c.devotional ? `<a href="#/devotionals/${encodeURIComponent(c.devotional)}">Read the collection devotional</a> · ` : ""}<a href="https://www.youtube.com/playlist?list=${encodeURIComponent(c.playlistId)}">YouTube playlist</a> · Transcripts for ${readableEntries} of ${playlistOrder.length} entries</p>
           <details class="playlist-contents"${readableEntries ? "" : " open"}><summary>Playlist contents in source order</summary><ol>${playlistOrder.map(id => {
             const message = readers.get(id);
@@ -523,6 +526,7 @@ export async function readerPage(id) {
             <div class="reader-meta">
               <span>${esc(sourceLabel(doc))}</span><span class="dot"></span>
               ${doc.postedOn ? `<time datetime="${esc(doc.postedOn)}">${esc(doc.postedOn)}</time><span class="dot"></span>` : ""}
+              ${!doc.postedOn && doc.firstSeenOn ? `<span>First seen ${esc(doc.firstSeenOn)}</span><span class="dot"></span>` : ""}
               <span>${fmt.minutes(doc.minutes)}</span><span class="dot"></span>
               <span>${fmt.number(doc.words)} words</span><span class="dot"></span>
               <span>${doc.kind === "prayer" ? "Prayer & worship" : "Teaching"}</span>

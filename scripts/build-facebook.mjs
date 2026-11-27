@@ -23,6 +23,7 @@ const PAGE_URL = "https://www.facebook.com/iamGospelWarrior";
 const AUTHOR = "John Domino Sanchez Asis";
 const PROFILE_ID = "100000032478992";
 const MOBILE = "https://r.jina.ai/http://m.facebook.com/iamGospelWarrior?sk=posts";
+const PHOTOS = "https://r.jina.ai/http://www.facebook.com/iamGospelWarrior/photos";
 const FEED = `https://r.jina.ai/https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(PAGE_URL)}&tabs=timeline&width=800&height=4000&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=false`;
 
 /* Sentences that are calls to action or promotions, not devotional content. */
@@ -126,8 +127,9 @@ function parseCapture(raw) {
     });
     const body = bodyLines.join(" ").replace(/\s+/g, " ").trim();
     if (!body || /(?:…|\.\.\.)?\s*See more\s*$/i.test(body)) continue;
+    if (AD.test(body.slice(0, 500)) || /(?:shout out to (?:my|our) newest|top (?:engagers?|fans)|free photo edits?|subscribers? only)/i.test(body.slice(0, 160))) continue;
     const post = makePost(body, PAGE_URL, postedAgo);
-    if (post) posts.push(post);
+    if (post && STUDY_LANGUAGE.test(post.paragraphs.join(" "))) posts.push(post);
   }
   if (!posts.length) throw new Error("No complete Gospel Warrior posts recognised in capture; archive not updated.");
   return posts;
@@ -148,7 +150,8 @@ const ARCHIVE_CTA = [
   /\b(?:i|mag)-(?:share|save|tag|follow|comment)\b|\b(?:like and share|tap the link|share on)\b/i,
   /from scandal to grace\s*[,—–-]*\s*because Jesus rewrites everything/i,
 ];
-const AD = /\b(?:this (?:powerful |new |premium )?(?:e-?book|workbook)|my (?:new |latest )?(?:e-?book|book)|(?:exclusi\w* (?:to|for)|only (?:for|available to)) (?:my |our )?subscribers|(?:available|included) (?:only )?inside (?:the |our )?gospel warrior library|use (?:the |my )?promo code|pre[- ]?order|book launch)\b/i;
+const AD = /\b(?:this (?:powerful |new |premium )?(?:e-?book|workbook)|my (?:new |latest )(?:e-?book|book)|(?:exclusi\w* (?:to|for)|only (?:for|available to)) (?:my |our )?subscribers|(?:available|included) (?:only )?inside (?:the |our )?gospel warrior library|use (?:the |my )?promo code|pre[- ]?order|book launch)\b/i;
+const STUDY_LANGUAGE = /\b(?:Jesus|Christ|Scripture|Bible|God|faith|prayer|Lord|Gospel|Diyos|Biblia|Cristo|Panginoon|Messiah)\b/i;
 const PERSONAL = /\bhappy (?:\d+(?:st|nd|rd|th) )?(?:birthday|(?:wedding )?anniversary)|\bto my (?:dear cousins|brother|wife|daughter|husband)|my brother Pachoy|we always thought that we would be the ones to teach you/i;
 const PROMO_FOOTER = [
   /^(?:new book(?:\s|:)|(?:final )?book (?:promo|launch|announcement|title)|upcoming books|announcement\W+(?:a |new |upcoming )?book)/i,
@@ -202,6 +205,23 @@ function studyParagraphs(body) {
 }
 
 async function readLibrary(file) {
+  if (/\.gz$/i.test(file)) {
+    const data = JSON.parse(gunzipSync(await readFile(file)));
+    if (data.archive?.publicProfileUrl !== PAGE_URL || !Array.isArray(data.posts)) throw new Error("Not a Gospel Warrior public Study Companion archive");
+    const index = [];
+    const contents = {};
+    for (const p of data.posts) {
+      if (p.author !== AUTHOR || !/^\d+$/.test(p.id)) throw new Error(`Unexpected public post in Study Companion: ${p.id}`);
+      const link = new URL(p.sourceUrl || p.url);
+      if (link.hostname === "web.facebook.com") link.hostname = "www.facebook.com";
+      if (link.pathname === "/photo/" && link.searchParams.get("fbid") === p.id) link.search = `?fbid=${p.id}`;
+      const photoId = p.image?.match(/[?&]media_id=(\d+)(?:&|$)/)?.[1];
+      index.push({ id: p.id, date: p.date?.slice(0, 10), bibleReferences: p.bibleReferences });
+      contents[p.id] = { id: p.id, postId: p.id, title: p.title, content: p.text, profileUrl: PAGE_URL, sourceUrl: link.href, photoId, postedAt: p.date };
+    }
+    console.log(`Study Companion: ${index.length} public records.`);
+    return { index, contents, companion: true, excludedIds: data.archive.readerExcludedPostIds || [] };
+  }
   const raw = await readFile(file, "utf8");
   if (!/\.html?$/i.test(file)) return JSON.parse(raw);
   const payload = raw.match(/window\.GW_GZ_B64\s*=\s*"([A-Za-z0-9+/=]+)"/);
@@ -218,14 +238,22 @@ function libraryPosts(library) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(info.date) || info.date < "2009-07-01" || info.date > today) continue;
     if (!/^\d+$/.test(entry.postId)) continue;
     const photo = entry.profileUrl === PAGE_URL && entry.sourceUrl === `https://www.facebook.com/photo/?fbid=${entry.postId}`;
-    if (!photo && !/^https:\/\/www\.facebook\.com\/iamGospelWarrior\/posts\/[\w-]+\/?$/.test(entry.sourceUrl)) continue;
+    if (!photo && !/^https:\/\/www\.facebook\.com\/iamGospelWarrior\/posts\/[\w:-]+\/?$/.test(entry.sourceUrl)) continue;
     const body = entry.content || "";
-    if (PERSONAL.test(entry.title) || /happy birthday, (?!Jesus\b)/i.test(body) || AD.test(body) || /e-?book|subscrib|giveaway|raffle/i.test(entry.title)) continue;
-    if (/\bUnlishop\b/i.test(body) || /happy mothers day/i.test(entry.title)) continue;
+    const offerTitle = /e-?book|subscrib|giveaway|raffle/i.test(entry.title);
+    // Some studies start with a standalone shop link and put their real
+    // heading on the next line. Remove the offer while retaining the study.
+    const leadingStoreLink = /^free e-?book\s*:\s*https?:\/\/\S+\s*$/i.test(entry.title.trim()) && body.length > 4000;
+    if (PERSONAL.test(entry.title) || /happy birthday, (?!Jesus\b)/i.test(body) || AD.test(body) || (offerTitle && !leadingStoreLink)) continue;
+    if (/\bUnlishop\b/i.test(body) || /happy mothers day|shout out to (?:my|our) newest|thanks for being a top engager|free photo edits?/i.test(entry.title)) continue;
     const post = makePost(body, entry.sourceUrl, undefined, entry.title);
-    if (!post || !/\b(?:Jesus|Christ|Scripture|Bible|God|faith|prayer|Lord|Gospel|Diyos|Biblia|Cristo|Panginoon)\b/i.test(post.paragraphs.join(" "))) continue;
+    if (!post) continue;
+    const text = post.paragraphs.join(" ");
+    if (!STUDY_LANGUAGE.test(text) && !info.bibleReferences?.some(ref => text.includes(ref))) continue;
     post.id = `fb-${entry.postId}`;
     post.postedOn = info.date;
+    if (entry.postedAt) post.postedAt = new Date(entry.postedAt).toISOString();
+    if (entry.photoId) post.photoId = entry.photoId;
     // The snapshot identifies duplicate editions by the canonical post ID.
     // Use a readable alternate only if the canonical record is unavailable.
     const group = entry.duplicateGroup || entry.id;
@@ -235,7 +263,7 @@ function libraryPosts(library) {
 }
 
 async function readPublicPage(url) {
-  const response = await fetch(url, { signal: AbortSignal.timeout(90_000) });
+  const response = await fetch(url, { headers: { "X-Cache-Tolerance": "600" }, signal: AbortSignal.timeout(45_000) });
   if (!response.ok) throw new Error(`Public page returned HTTP ${response.status}: ${url}`);
   return response.text();
 }
@@ -262,30 +290,40 @@ async function main() {
   if (!refresh && !library && !files.length) files.push(RAW);
   const incoming = [];
   const excluded = new Set();
+  let companion = false;
   for (const file of files) incoming.push(...parseCapture(await readFile(file, "utf8")));
   if (library) {
     const snapshot = await readLibrary(library);
+    companion = snapshot.companion === true;
     const posts = libraryPosts(snapshot);
     for (const entry of Object.values(snapshot.contents)) excluded.add(`fb-${entry.postId}`);
     for (const p of posts) excluded.delete(p.id);
+    for (const id of snapshot.excludedIds || []) excluded.add(`fb-${id}`);
     console.log(`Library: ${posts.length} eligible entries before deduplication.`);
     incoming.push(...posts);
   }
   if (refresh) {
+    const existing = await readArchive(OUT);
+    const knownPhotos = new Set(existing.posts.map(p => p.photoId || new URL(p.source).searchParams.get("fbid")));
     // One unavailable photo or timeline must not discard the other captures.
     const collect = async (url) => {
       try { incoming.push(...await capture(url)); }
       catch (err) { console.warn(`Skipped public capture: ${err.message}`); }
     };
     await collect(FEED);
-    const profile = await readPublicPage(MOBILE).catch(err => { console.warn(err.message); return ""; });
-    const links = [...profile.matchAll(/https:\/\/www\.facebook\.com\/photo\/\?fbid=(\d+)&set=pb\.(\d+)\./g)];
-    const ids = new Set(links.filter(m => m[2] === PROFILE_ID).map(m => m[1]));
+    const ids = new Set();
+    for (const listing of [MOBILE, PHOTOS]) {
+      const page = await readPublicPage(listing).catch(err => { console.warn(err.message); return ""; });
+      for (const m of page.matchAll(/https:\/\/www\.facebook\.com\/photo(?:\/|\.php)\?fbid=(\d+)&set=pb\.(\d+)\./g)) {
+        if (m[2] === PROFILE_ID) ids.add(m[1]);
+      }
+      if (ids.size) break;
+    }
     console.log(`Found ${ids.size} public photo links.`);
     for (const id of ids) {
       const photo = `https://www.facebook.com/photo.php?fbid=${id}&set=pb.${PROFILE_ID}.-2207520000&type=3`;
       const embed = `https://r.jina.ai/https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(photo)}&show_text=true`;
-      await collect(embed);
+      if (!knownPhotos.has(id)) await collect(embed);
     }
   }
   if (!incoming.length) throw new Error("No complete posts to merge; archive not updated.");
@@ -303,15 +341,23 @@ async function main() {
     if (byHash.has(undefined) || byHash.size !== posts.size) throw new Error("Invalid source hashes in archive");
     for (const p of incoming) {
       const key = textKey(p);
-      const id = bySource.get(p.source) ?? byHash.get(p.sourceHash) ?? (posts.has(p.id) ? p.id : null);
+      const photoReader = p.photoId && bySource.get(`https://www.facebook.com/photo/?fbid=${p.photoId}`);
+      const id = bySource.get(p.source) ?? photoReader ?? byHash.get(p.sourceHash) ?? (posts.has(p.id) ? p.id : null);
       if (!id && byText.has(key)) continue;
       const readerId = id ?? p.id;
       const old = posts.get(readerId);
+      // The Companion already cleaned its copy. Keep previously imported text
+      // from the original capture and attach the stable media ID for refreshes.
+      if (companion && old && p.postedOn) {
+        posts.set(readerId, { ...old, photoId: p.photoId || old.photoId, postedAt: p.postedAt || old.postedAt });
+        continue;
+      }
       // The timeline can flatten a photo caption into one line. Keep the
       // verified, dated per-post edition when that same preview reappears.
       if (old?.postedOn && old.source !== PAGE_URL && !p.postedOn && p.sourceHash === old.sourceHash) continue;
       const source = p.source === PAGE_URL && old ? old.source : p.source;
-      posts.set(readerId, { ...old, ...p, id: readerId, source, postedAgo: old?.postedAgo ?? p.postedAgo, postedOn: p.postedOn ?? old?.postedOn });
+      posts.set(readerId, { ...old, ...p, id: readerId, source, postedAgo: old?.postedAgo ?? p.postedAgo, postedOn: p.postedOn ?? old?.postedOn,
+        firstSeenOn: old?.firstSeenOn ?? (!old && refresh && !p.postedOn ? new Date().toISOString().slice(0, 10) : undefined) });
       if (source !== PAGE_URL) bySource.set(source, readerId);
       byHash.set(p.sourceHash, readerId);
       byText.set(key, readerId);
