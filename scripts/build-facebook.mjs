@@ -78,6 +78,12 @@ const APPEALS = [
   /And if this message has touched something you have been silently battling[\s\S]+?Before you leave, (?=remember Reuben)/i,
   /You do not need to publicly expose the intimate details of your struggle\. But if this has uncovered something[\s\S]+?(?=Because the Gospel was never intended)/i,
   /If this message has spoken to something you have been carrying, save it\.[\s\S]+?(?=Never underestimate what God can accomplish)/i,
+  /If these words have exposed something hidden within you, and you feel comfortable expressing it, comment[\s\S]+?(?=Because in Christ, your worst chapter)/i,
+  /And this is where I want to extend a personal invitation to you\.\s+If Gospel Warrior[\s\S]+?(?=But before you leave, return with me to that trembling person)/i,
+  /If this describes the season you are walking through, comment[\s\S]+?(?=The book of Judges repeatedly reveals)/i,
+  /Save this article for the days when fear begins negotiating with your faith again\.[\s\S]+?(?=And before you leave, remember Deborah)/i,
+  /If this is exposing something you have been carrying silently, you can comment[\s\S]+?(?=But here is where we must understand the Gospel correctly)/i,
+  /If you prayed that sincerely, comment “No more hiding\.[\s\S]+?(?=Never forget what that ancient military camp teaches)/i,
 ];
 
 const sentences = new Intl.Segmenter("en", { granularity: "sentence" });
@@ -277,6 +283,40 @@ async function capture(url) {
   return posts;
 }
 
+const wordsOf = post => post.paragraphs.join(" ").normalize("NFKC").toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+const phrasesOf = words => new Set(words.slice(4).map((_, i) => words.slice(i, i + 5).join(" ")));
+
+// A page preview can omit the headline, flatten paragraphs or split a sales
+// pitch differently from its linked caption. Compare across the entire study;
+// title matches, repeated Scripture and shared sign-offs alone aren't enough.
+function mergeTimelineEditions(posts) {
+  const linked = [...posts.values()].filter(p => p.source !== PAGE_URL);
+  for (const preview of posts.values()) {
+    if (preview.source !== PAGE_URL || preview.words < 200) continue;
+    const words = wordsOf(preview);
+    const anchors = [0.2, 0.4, 0.6, 0.8].map(fraction => {
+      const start = Math.floor(words.length * fraction);
+      return words.slice(start, start + 16).join(" ");
+    });
+    const phrases = phrasesOf(words);
+    for (const candidate of linked) {
+      if (Math.min(preview.words, candidate.words) < 0.8 * Math.max(preview.words, candidate.words)) continue;
+      const candidateWords = wordsOf(candidate);
+      const text = candidateWords.join(" ");
+      if (anchors.filter(anchor => text.includes(anchor)).length < 3) continue;
+      const other = phrasesOf(candidateWords);
+      let shared = 0;
+      for (const phrase of other) if (phrases.has(phrase)) shared++;
+      if (shared < 0.975 * Math.min(other.size, phrases.size) || shared < 0.8 * Math.max(other.size, phrases.size)) continue;
+      const kept = posts.get(candidate.id);
+      const aliases = new Set([...(kept.aliases || []), preview.id, ...(preview.aliases || [])]);
+      posts.set(kept.id, { ...kept, aliases: [...aliases].sort() });
+      posts.delete(preview.id);
+      break;
+    }
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const refresh = args.includes("--refresh");
@@ -336,10 +376,12 @@ async function main() {
     const posts = new Map(retained.map(p => [p.id, p]));
     const byHash = new Map(retained.map(p => [p.sourceHash, p.id]));
     const bySource = new Map(retained.filter(p => p.source !== PAGE_URL).map(p => [p.source, p.id]));
+    const knownAliases = new Set(retained.flatMap(p => p.aliases || []));
     const textKey = p => digest(p.paragraphs.join(" ").normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim());
     const byText = new Map(retained.map(p => [textKey(p), p.id]));
     if (byHash.has(undefined) || byHash.size !== posts.size) throw new Error("Invalid source hashes in archive");
     for (const p of incoming) {
+      if (knownAliases.has(p.id)) continue;
       const key = textKey(p);
       const photoReader = p.photoId && bySource.get(`https://www.facebook.com/photo/?fbid=${p.photoId}`);
       const id = bySource.get(p.source) ?? photoReader ?? byHash.get(p.sourceHash) ?? (posts.has(p.id) ? p.id : null);
@@ -362,7 +404,9 @@ async function main() {
       byHash.set(p.sourceHash, readerId);
       byText.set(key, readerId);
     }
-    const added = posts.size - retained.length;
+    mergeTimelineEditions(posts);
+    const priorIds = new Set(archive.posts.map(p => p.id));
+    const added = [...posts.keys()].filter(id => !priorIds.has(id)).length;
     const merged = [...posts.values()].sort(postOrder);
     if ((library && !archive.parts) || merged.length !== archive.posts.length || merged.some((post, i) => post !== archive.posts[i] && JSON.stringify(post) !== JSON.stringify(archive.posts[i]))) {
       archive.posts = merged;

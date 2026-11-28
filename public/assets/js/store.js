@@ -57,6 +57,24 @@ export const store = {
     const list = read("bookmarks", []);
     return Array.isArray(list) ? list : [];
   },
+  relinkReaders(index) {
+    const replacements = new Map();
+    for (const doc of index) for (const alias of doc.aliases || []) replacements.set(alias, doc.id);
+    if (!replacements.size) return;
+    const saved = this.bookmarks();
+    if (saved.some(id => replacements.has(id))) {
+      write("bookmarks", [...new Set(saved.map(id => replacements.get(id) || id))]);
+    }
+    const progress = this.progress();
+    let changed = false;
+    for (const [alias, id] of replacements) {
+      if (!progress[alias]) continue;
+      if (!progress[id] || progress[alias].at > progress[id].at) progress[id] = progress[alias];
+      delete progress[alias];
+      changed = true;
+    }
+    if (changed) write("progress", progress);
+  },
   isBookmarked(id) {
     return this.bookmarks().includes(id);
   },

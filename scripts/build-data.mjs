@@ -369,6 +369,7 @@ async function main() {
       postedOn: fb?.postedOn,
       postedAt: fb?.postedAt,
       firstSeenOn: fb?.firstSeenOn,
+      aliases: fb?.aliases,
       accent: COLLECTIONS.find((c) => c.slug === collection)?.accent || "gold",
     };
     index.push(doc);

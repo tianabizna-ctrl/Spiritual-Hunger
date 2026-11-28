@@ -1,5 +1,7 @@
 /* Data access, formatting, search and small text helpers. */
 
+import { store } from "./store.js?v=20261128-1";
+
 const cache = new Map();
 
 async function getJSON(path) {
@@ -8,6 +10,10 @@ async function getJSON(path) {
       .then((res) => {
         if (!res.ok) throw new Error(`Could not load ${path} (${res.status})`);
         return res.json();
+      })
+      .then(value => {
+        if (path === "index.json") store.relinkReaders(value);
+        return value;
       })
       .catch((err) => {
         if (cache.get(path) === promise) cache.delete(path);

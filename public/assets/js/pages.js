@@ -4,12 +4,12 @@ import { icon, TOPIC_ICONS } from "./icons.js?v=20261127-3";
 import {
   header, footer, pageHero, sectionHead, messageCard, devotionalCard,
   collectionCard, emptyState, quoteBand, collectionName, sourceLabel, topicIcon, mediaHtml,
-} from "./components.js?v=20261127-5";
+} from "./components.js?v=20261128-1";
 import {
   data, fmt, esc, image, dailyIndex, relatedMessages, topicCounts,
   collectionBySlug, searchMessages, snippetFor,
-} from "./data.js?v=20261127-5";
-import { store } from "./store.js?v=20261127-3";
+} from "./data.js?v=20261128-1";
+import { store } from "./store.js?v=20261128-1";
 
 const collectionOptions = (collections) => collections.filter((c) => c.count > 0);
 
@@ -495,8 +495,9 @@ export async function collectionPage(slug, query = new URLSearchParams()) {
    ============================================================ */
 export async function readerPage(id) {
   const [index, collections] = await Promise.all([data.index(), data.collections()]);
-  const doc = index.find((m) => m.id === id);
+  const doc = index.find((m) => m.id === id || m.aliases?.includes(id));
   if (!doc) return notFoundPage("We could not find that message.");
+  id = doc.id;
   let text;
   try {
     text = await data.text(id);

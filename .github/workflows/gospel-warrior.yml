@@ -27,7 +27,7 @@ jobs:
         run: node scripts/build-facebook.mjs --refresh
       - name: Build and commit new readings
         run: |
-          if git diff --quiet -- content/gospel-warrior.json; then exit 0; fi
+          if git diff --quiet -- content/gospel-warrior.json && node -e "const fs=require('node:fs'); const hash=require('node:crypto').createHash('sha256').update(fs.readFileSync('content/gospel-warrior.json')).digest('hex'); process.exit(require('./public/data/stats.json').gospelWarriorRevision===hash?0:1)"; then exit 0; fi
           node scripts/build-data.mjs --facebook-only
           git add -- content/gospel-warrior.json content/gospel-warrior/ public/data/
           git config user.name 'github-actions[bot]'
