@@ -1,6 +1,6 @@
 /* Data access, formatting, search and small text helpers. */
 
-import { store } from "./store.js?v=20261128-2";
+import { store } from "./store.js?v=20261128-3";
 
 const cache = new Map();
 
@@ -46,8 +46,9 @@ export const data = {
   async text(id) { return getJSON(`texts/${encodeURIComponent(id)}.json`); },
   async poster(id) {
     if (cache.has(`posters/${id}.webp`)) return cache.get(`posters/${id}.webp`);
-    const promise = fetch(`posters/${encodeURIComponent(id)}.webp`)
-      .then((res) => { if (!res.ok) throw new Error(`poster ${res.status}`); return `posters/${encodeURIComponent(id)}.webp`; })
+    const url = new URL(`posters/${encodeURIComponent(id)}.webp`, document.baseURI);
+    const promise = fetch(url, { cache: "force-cache" })
+      .then((res) => { if (!res.ok) throw new Error(`poster ${res.status}`); return url.href; })
       .catch(() => null);
     cache.set(`posters/${id}.webp`, promise);
     return promise;
