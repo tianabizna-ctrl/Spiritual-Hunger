@@ -956,6 +956,7 @@ figure, blockquote { margin: 0; }
 .collection-thumbs .card-media-ph svg { width: 22px; height: 22px; }
 /* Gospel Warrior poster cards: portrait artwork fills the frame */
 .card-media.has-poster img { object-fit: cover; filter: saturate(0.72) contrast(1.02) brightness(0.97); }
+.card-media.has-poster img.card-poster ~ .card-media-ph { display: none; }
 .message-card:hover .card-media.has-poster img { transform: scale(1.03); }
 .card-date {
   position: absolute;

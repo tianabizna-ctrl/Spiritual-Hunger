@@ -1,15 +1,15 @@
 /* Application shell: routing, search, persistence wiring, quiet interactions. */
 
-import { header, footer, collectionName } from "./components.js?v=20261128-3";
-import { icon } from "./icons.js?v=20261128-3";
+import { header, footer, collectionName } from "./components.js?v=20261128-4";
+import { icon } from "./icons.js?v=20261128-4";
 import {
   data, esc, tokenize, highlight, searchMessages, snippetFor,
-} from "./data.js?v=20261128-3";
-import { store } from "./store.js?v=20261128-3";
+} from "./data.js?v=20261128-4";
+import { store } from "./store.js?v=20261128-4";
 import {
   homePage, libraryPage, readerPage, devotionalsPage, devotionalPage,
   prayerPage, collectionsPage, collectionPage, savedPage, aboutPage, notFoundPage,
-} from "./pages.js?v=20261128-3";
+} from "./pages.js?v=20261128-4";
 
 const app = document.getElementById("app");
 const searchRoot = document.getElementById("search-root");

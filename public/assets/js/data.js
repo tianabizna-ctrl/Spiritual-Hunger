@@ -1,6 +1,6 @@
 /* Data access, formatting, search and small text helpers. */
 
-import { store } from "./store.js?v=20261128-3";
+import { store } from "./store.js?v=20261128-4";
 
 const cache = new Map();
 
