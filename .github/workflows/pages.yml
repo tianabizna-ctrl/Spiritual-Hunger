@@ -21,11 +21,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Build public data
-        run: node scripts/build-data.mjs --facebook-only
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

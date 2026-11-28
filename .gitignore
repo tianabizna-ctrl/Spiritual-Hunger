@@ -5,5 +5,3 @@ node_modules/
 __pycache__/
 .preflight.json
 
-# Gospel Warrior poster art (generated from the Study Companion archive)
-public/posters/
