@@ -1,15 +1,15 @@
 /* Application shell: routing, search, persistence wiring, quiet interactions. */
 
-import { header, footer, collectionName } from "./components.js?v=20261128-1";
-import { icon } from "./icons.js?v=20261127-3";
+import { header, footer, collectionName } from "./components.js?v=20261128-2";
+import { icon } from "./icons.js?v=20261128-2";
 import {
   data, esc, tokenize, highlight, searchMessages, snippetFor,
-} from "./data.js?v=20261128-1";
-import { store } from "./store.js?v=20261128-1";
+} from "./data.js?v=20261128-2";
+import { store } from "./store.js?v=20261128-2";
 import {
   homePage, libraryPage, readerPage, devotionalsPage, devotionalPage,
   prayerPage, collectionsPage, collectionPage, savedPage, aboutPage, notFoundPage,
-} from "./pages.js?v=20261128-1";
+} from "./pages.js?v=20261128-2";
 
 const app = document.getElementById("app");
 const searchRoot = document.getElementById("search-root");
@@ -110,6 +110,8 @@ async function render() {
     }
   }
 
+  hydratePosters(main || app);
+
   lastPct = -1;
   lastReaderId = "";
   lastSave = 0;
@@ -117,6 +119,32 @@ async function render() {
   updateHeader();
   updateReadingProgress();
   observeReveals();
+}
+
+/* Gospel Warrior cards render the poster after the page mounts. */
+async function hydratePosters(root) {
+  const cards = root.querySelectorAll(".message-card[data-message]");
+  if (!cards.length) return;
+  const seen = new Set();
+  const jobs = [];
+  for (const card of cards) {
+    const id = card.dataset.message;
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    jobs.push(data.poster(id).then((poster) => {
+      if (!poster || card.isConnected === false || !root.contains(card)) return;
+      const media = card.querySelector(".card-media.has-poster");
+      if (!media || media.querySelector("img.card-poster")) return;
+      const img = new Image();
+      img.className = "card-poster";
+      img.alt = "";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.src = poster;
+      media.insertBefore(img, media.firstChild);
+    }));
+  }
+  await Promise.allSettled(jobs);
 }
 
 /* ---------- header, menu, theme ---------- */

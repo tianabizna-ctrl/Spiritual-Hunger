@@ -1,8 +1,8 @@
 /* Shared view components. */
 
-import { icon, logoMark, TOPIC_ICONS } from "./icons.js?v=20261127-3";
-import { esc, fmt, image, thumb } from "./data.js?v=20261128-1";
-import { store } from "./store.js?v=20261128-1";
+import { icon, logoMark, TOPIC_ICONS } from "./icons.js?v=20261128-2";
+import { esc, fmt, image, thumb } from "./data.js?v=20261128-2";
+import { store } from "./store.js?v=20261128-2";
 
 export const COLLECTION_NAMES = {
   "media-content": "Media Content",
@@ -47,9 +47,10 @@ export function sourceLabel(message) {
   return ['selman', 'feeling-lost', 'morning-prayer'].includes(message.collection) ? 'Joshua Selman collection' : 'Ministry collection';
 }
 
-/* Thumbnail for YouTube-backed messages; a typographic placeholder otherwise. */
-export function mediaHtml(m, { size = "hq", alt = "", className = "" } = {}) {
+/* Thumbnail: YouTube thumbnail, Gospel Warrior poster, or typographic placeholder. */
+export function mediaHtml(m, { size = "hq", alt = "", className = "", poster = "" } = {}) {
   if (m && m.thumb === "") {
+    if (poster) return `<img class="card-poster${className ? ` ${className}` : ""}" src="${poster}" alt="${alt}" loading="lazy" decoding="async" />`;
     return `<div class="card-media-ph${className ? ` ${className}` : ""}" data-accent="${esc(m.accent || "gold")}" aria-hidden="true">${icon("bookOpen")}</div>`;
   }
   return image(m.id, { size, alt, className });
@@ -187,9 +188,10 @@ export function messageCard(m) {
   const topics = (m.topics || []).slice(0, 2).map((t) => `<span class="tag">${esc(t)}</span>`).join("");
   const kind = m.kind === "prayer" ? "Prayer" : "Teaching";
   return `<article class="message-card" data-message="${esc(m.id)}">
-    <a class="card-media" href="#/read/${encodeURIComponent(m.id)}" aria-label="Read ${esc(m.title)}">
+    <a class="card-media${m.thumb === "" ? " has-poster" : ""}" href="#/read/${encodeURIComponent(m.id)}" aria-label="Read ${esc(m.title)}">
       ${mediaHtml(m, { alt: m.title, size: "hq" })}
       <span class="card-badge${m.kind === "prayer" ? " prayer" : ""}">${icon(m.kind === "prayer" ? "flame" : "bookOpen")}${kind}</span>
+      ${m.thumb === "" && m.postedOn ? `<span class="card-date" title="${new Date(m.postedOn + "T12:00:00").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}">${new Date(m.postedOn + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>` : ""}
     </a>
     <button class="card-save${saved ? " is-saved" : ""}" type="button" data-save="${esc(m.id)}" aria-pressed="${saved}" aria-label="${saved ? "Remove bookmark" : "Bookmark this message"}">
       ${icon(saved ? "bookmarkFill" : "bookmark")}

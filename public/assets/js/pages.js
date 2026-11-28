@@ -1,15 +1,15 @@
 /* Page renderers. Each returns { title, content, mount?, cleanup? }. */
 
-import { icon, TOPIC_ICONS } from "./icons.js?v=20261127-3";
+import { icon, TOPIC_ICONS } from "./icons.js?v=20261128-2";
 import {
   header, footer, pageHero, sectionHead, messageCard, devotionalCard,
   collectionCard, emptyState, quoteBand, collectionName, sourceLabel, topicIcon, mediaHtml,
-} from "./components.js?v=20261128-1";
+} from "./components.js?v=20261128-2";
 import {
   data, fmt, esc, image, dailyIndex, relatedMessages, topicCounts,
   collectionBySlug, searchMessages, snippetFor,
-} from "./data.js?v=20261128-1";
-import { store } from "./store.js?v=20261128-1";
+} from "./data.js?v=20261128-2";
+import { store } from "./store.js?v=20261128-2";
 
 const collectionOptions = (collections) => collections.filter((c) => c.count > 0);
 
@@ -526,7 +526,7 @@ export async function readerPage(id) {
             <h1 class="reader-title">${esc(doc.title)}</h1>
             <div class="reader-meta">
               <span>${esc(sourceLabel(doc))}</span><span class="dot"></span>
-              ${doc.postedOn ? `<time datetime="${esc(doc.postedOn)}">${esc(doc.postedOn)}</time><span class="dot"></span>` : ""}
+              ${doc.postedOn ? `<time datetime="${esc(doc.postedOn)}">${new Date(doc.postedOn + (doc.postedOn.length === 10 ? "T12:00:00" : "")).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}${doc.postedAt ? ` · ${new Date(doc.postedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}` : ""}</time><span class="dot"></span>` : ""}
               ${!doc.postedOn && doc.firstSeenOn ? `<span>First seen ${esc(doc.firstSeenOn)}</span><span class="dot"></span>` : ""}
               <span>${fmt.minutes(doc.minutes)}</span><span class="dot"></span>
               <span>${fmt.number(doc.words)} words</span><span class="dot"></span>
@@ -573,6 +573,7 @@ export async function readerPage(id) {
           </div>
           <div class="source-title">${esc(doc.title)}</div>
           <div class="source-sub">${esc(collectionName(doc.collection))} · ${fmt.minutes(doc.minutes)}</div>
+          ${doc.postedOn ? `<div class="source-date">Published ${new Date(doc.postedOn + (doc.postedOn.length === 10 ? "T12:00:00" : "")).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}${doc.postedAt ? ` at ${new Date(doc.postedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}` : ""}</div>` : ""}
           <div class="sidebar-actions">
             <a class="btn btn-primary btn-sm" href="${source}" target="_blank" rel="noopener noreferrer">${doc.origin === "facebook" ? "Read source" : "Watch source"} ${icon("external")}</a>
             ${progress && progress.pct > 2 ? `<button class="btn btn-outline btn-sm" type="button" data-resume="${progress.pct}">Resume ${progress.pct}%</button>` : ""}
@@ -616,6 +617,17 @@ export async function readerPage(id) {
           const y = article.offsetTop + (article.offsetHeight * pct) / 100;
           window.scrollTo({ top: y, behavior: "smooth" });
         });
+      }
+      const thumb = root.querySelector(".reader-thumb");
+      if (thumb && !thumb.querySelector("img")) {
+        data.poster(id).then((poster) => {
+          if (!poster || !root.isConnected) return;
+          const img = new Image();
+          img.alt = doc.title;
+          img.decoding = "async";
+          img.src = poster;
+          thumb.insertAdjacentElement("afterbegin", img);
+        }).catch(() => {});
       }
     },
   };

@@ -10,11 +10,20 @@
  *      -> public/data/stats.json
  *      -> public/data/home.json       (featured + quote + daily verses)
  */
-import { readFile, writeFile, mkdir, readdir, rm } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir, rm, copyFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawn } from "node:child_process";
+
+function run(cmd, args) {
+  return new Promise((resolve) => {
+    const child = spawn(cmd, args, { stdio: "ignore" });
+    child.on("error", () => resolve({ code: 1 }));
+    child.on("close", (code) => resolve({ code }));
+  });
+}
 import { readArchive } from "./gospel-warrior-data.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -370,6 +379,7 @@ async function main() {
       postedAt: fb?.postedAt,
       firstSeenOn: fb?.firstSeenOn,
       aliases: fb?.aliases,
+      poster: fb?.poster,
       accent: COLLECTIONS.find((c) => c.slug === collection)?.accent || "gold",
     };
     index.push(doc);
@@ -464,6 +474,21 @@ async function main() {
   await writeFile(path.join(OUT, "collections.json"), JSON.stringify(collections, null, 2));
   await writeFile(path.join(OUT, "stats.json"), JSON.stringify(stats, null, 2));
   await writeFile(path.join(OUT, "search.json"), JSON.stringify({ docs: index.map((m) => m.id), terms }));
+
+  // Copy Gospel Warrior poster art so the site can attach a photo to each study.
+  const POSTER_OUT = path.join(ROOT, "public", "posters");
+  await mkdir(POSTER_OUT, { recursive: true });
+  let posters = 0;
+  for (const rec of index) {
+    if (rec.origin !== "facebook" || !rec.poster) continue;
+    const src = path.join(ROOT, rec.poster);
+    const dest = path.join(POSTER_OUT, `${rec.id}.webp`);
+    const exists = (await stat(dest).then(() => true, () => false));
+    if (exists) { posters++; continue; }
+    await copyFile(src, dest);
+    posters++;
+  }
+  console.log(`Gospel Warrior posters ready: ${posters}.`);
   if (facebookOnly) {
     console.log(`Published data ready: ${fbPosts.size} Gospel Warrior readings in an index of ${index.length}.`);
     return;

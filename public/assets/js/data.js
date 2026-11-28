@@ -1,6 +1,6 @@
 /* Data access, formatting, search and small text helpers. */
 
-import { store } from "./store.js?v=20261128-1";
+import { store } from "./store.js?v=20261128-2";
 
 const cache = new Map();
 
@@ -44,6 +44,14 @@ export const data = {
   async prayer() { return getJSON("prayer.json"); },
   async searchIndex() { return getJSON("search.json"); },
   async text(id) { return getJSON(`texts/${encodeURIComponent(id)}.json`); },
+  async poster(id) {
+    if (cache.has(`posters/${id}.webp`)) return cache.get(`posters/${id}.webp`);
+    const promise = fetch(`posters/${encodeURIComponent(id)}.webp`)
+      .then((res) => { if (!res.ok) throw new Error(`poster ${res.status}`); return `posters/${encodeURIComponent(id)}.webp`; })
+      .catch(() => null);
+    cache.set(`posters/${id}.webp`, promise);
+    return promise;
+  },
   async core() {
     const [index, collections, stats, home] = await Promise.all([
       this.index(), this.collections(), this.stats(), this.home(),
